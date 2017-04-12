@@ -1,8 +1,15 @@
 package com.test.a4over6_vpn;
 
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,7 +25,23 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(startBackground());
+        tv.setText("???");
+
+        //创建IP信息管道
+        File extDir = Environment.getExternalStorageDirectory();
+        Log.d("ykd",extDir.toString());
+        File ipTunnel = new File(extDir,"ip_pipe");
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(ipTunnel);
+            BufferedOutputStream out = new BufferedOutputStream(fileOutputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        //TODO 创建流量信息管道 info_pipe ，开启VPN服务，将安卓虚接口写入IP信息管道
+//        out.write(arr, 0, arr.length)
+//        out.flush();
+//        out.close();
     }
 
     /**
