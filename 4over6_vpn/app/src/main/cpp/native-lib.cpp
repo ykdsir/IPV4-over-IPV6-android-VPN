@@ -23,6 +23,7 @@
 
 #define MAXBUFF 1024*128
 #define DATA_SIZE 4096
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"ykd",__VA_ARGS__)
 
 std::string IP_TUNNEL = "/com.test.a4over6_vpn/ip_pipe";
 std::string INFO_TUNNEL = "/com.test.a4over6_vpn/info_pipe";
@@ -30,19 +31,52 @@ std::string INFO_TUNNEL = "/com.test.a4over6_vpn/info_pipe";
 struct Msg{
     int length;
     char type;
-    char data[4096];
+    char data[DATA_SIZE];
+    Msg(){
+        memset(data,0,DATA_SIZE);
+    }
 };
 
+int sockfd;//套接字接口
+time_t preHeartbeatTime = -1;//上一次心跳时间
+time_t curHeartbeatTime = -1;//当前心跳时间
+bool socketLive = true;//socket是否存活
+int virIntFileDescriptor = -1;//虚接口描述符
+long recvLength = 0;
+long recvTotalLength = 0;
+long recvCount = 0;
+long sendLength = 0;
+long sendTotalLength = 0;
+long sendCount = 0;
 
-int sockfd;
-time_t preHeartbeatTime = -1;
-time_t curHeartbeatTime = -1;
-bool socketLive = true;
-void readTun(std::string tunnel,char* data,long length){
 
+//设置Msg结构体的信息
+void setMsg(Msg* msg,char type,int data_length,char* data ){
+    msg->type = type;
+    if (data == NULL){
+        data_length = 0;
+    } else{
+        memcpy(msg->data,0, sizeof(msg->data));
+        memcpy(msg->data,data,(data_length));
+    }
+    msg->length = 5 + data_length;
 }
 
-int writeTun(std::string tunnel,char* data,long length){
+//读管道
+void readTun(std::string tunnel,char* data,unsigned long length){
+    int fifo_handle = open(tunnel.c_str(),O_RDONLY);
+    if(fifo_handle != -1){
+        if((read(fifo_handle,data,length) )< 0){
+            LOGD("read tunnel error\n");
+        }
+    } else{
+        LOGD("open tunnel error\n");
+        LOGD(strerror(errno));
+    }
+}
+
+//写管道
+int writeTun(std::string tunnel,char* data,unsigned long length){
     int fifo_handle = open(tunnel.c_str(),O_RDWR|O_CREAT|O_TRUNC);
     long writein = 0,extra = 0;
     if (fifo_handle > 0){
@@ -59,50 +93,129 @@ int writeTun(std::string tunnel,char* data,long length){
     }
 }
 
-void setMsg(Msg* msg,char type,int data_length,char* data ){
-    msg->type = type;
-    if (data == NULL){
-        data_length = 0;
-    } else{
-        memcpy(msg->data,0, sizeof(msg->data));
-        memcpy(msg->data,data,(data_length));
+//读虚接口
+void* readVirtualInterfaceThr(void* args){
+    char readFromVI[DATA_SIZE];
+    while (1){
+        if(!socketLive)
+            break;
+        memset(readFromVI,0,DATA_SIZE);
+        long length = read(virIntFileDescriptor,readFromVI,DATA_SIZE);
+        if(length > 0){
+            Msg sendPkg;
+            setMsg(&sendPkg,IT_REQUEST,strlen(readFromVI),readFromVI);
+            if(send(sockfd,&sendPkg, sizeof(Msg),0)){
+//                return strerror(errno);
+                LOGD(strerror(errno));
+                continue;
+            }
+            sendLength+=length;
+            sendTotalLength += length;
+            ++sendCount;
+        }
     }
-    msg->length = 5 + data_length;
+    return NULL;
 }
 
 void* heartbeatPackThr(void* args){
     printf("heart beat pack thread\n");
+    preHeartbeatTime = time(NULL);
+    int counter = 0;
+    Msg counterHeartbeat;
+    time_t curTime;
+    char toFront[MAXBUFF];//传递给前台的相关数据
+    long uploadSpeed = 0,downloadSpeed = 0;
+    time_t interval;
+    while (1){
+        if (!socketLive){
+            LOGD("heart beat package socketlive failed!\n");
+            return NULL;
+        }
+        sleep(1);
+        curTime = time(NULL);//当前时间
+        interval = curTime - preHeartbeatTime
+        if(interval > 60){
+            socketLive = false;
+            return NULL;
+        } else{
+            uploadSpeed = downloadSpeed = 0;
+            //TODO 流量统计传送到前台
+            /*
+             * 上传、下载速度
+             * 上传总流量和包数
+             * 下载总流量和包数
+             * IPV4，IPV6地址？？
+             */
+            uploadSpeed =(sendLength/1024)/interval;
+            downloadSpeed = (recvLength/1024)/interval;
+            sprintf(toFront,"%ld %ld %ld %ld %ld %ld",uploadSpeed,downloadSpeed,sendTotalLength,sendCount,recvTotalLength,recvCount);
+            writeTun(INFO_TUNNEL,toFront,strlen(toFront));//将信息写入流量信息管道
+            sendLength = 0;
+            recvLength = 0;
+            ++counter;
+            if (counter >= 20){
+                setMsg(&counterHeartbeat,HEARTBEAT,0,NULL);
+                if(send(sockfd,&counterHeartbeat, sizeof(Msg),0) < 0 ) {
+                    LOGD(strerror(errno));
+                    return NULL;
+                }
+                counter = 0;
+            }
+        }
+    }
+
     return NULL;
 }
 
 void* dataPackThr(void* args){
     printf("data pack thread\n");
-    //发送IP请求
+
     Msg ipRequest,reciveMsg;
     long length;
+    pthread_t virIntThread;
+
+    //发送IP请求
     setMsg(&ipRequest,IP_REQUEST,0,NULL);
     if(send(sockfd,&ipRequest, sizeof(Msg),0)<0){
         return strerror(errno);
     }
 
     char recvBuff[MAXBUFF];
-    preHeartbeatTime = time(NULL);
+    char toWrite[DATA_SIZE];
     while (1){
         if(!socketLive)
             break;
+        //接收服务器回复
+        memset(recvBuff,0,MAXBUFF* sizeof(char));
+        memset(toWrite,0,DATA_SIZE);
         length = recv(sockfd,recvBuff,0, sizeof(recvBuff));
         memcpy(&reciveMsg,recvBuff, sizeof(reciveMsg));
         switch (reciveMsg.type){
             case IP_RESPONCE:
                 char ip[20],router[20],dns1[20],dns2[20],dns3[20];
                 sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
-                char toWrite[DATA_SIZE];
                 sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
                 writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
-                //TODO 读取前台传递的虚接口，封装102类型报文
+                //Done 读取前台传递的虚接口，封装102类型报文
+                memset(recvBuff,0,MAXBUFF* sizeof(char));//此时recvBuff暂时用来保存读取虚接口的文件描述符
+                readTun(IP_TUNNEL,recvBuff,MAXBUFF);
+                sscanf(recvBuff,"%d",&virIntFileDescriptor);
+
+                pthread_create(&virIntThread,NULL,readVirtualInterfaceThr,NULL);
+                pthread_join(virIntThread,NULL);
                 break;
+
             case IT_RESPONCE:
+                sscanf(reciveMsg.data,"%s",toWrite);
+                if(write(virIntFileDescriptor,toWrite,DATA_SIZE) < 0){
+                    return strerror(errno);
+                } else{
+                    ++recvCount;
+                    recvLength += strlen(toWrite);
+                    recvTotalLength += strlen(toWrite);
+                }
                 break;
+
             case HEARTBEAT:
                 curHeartbeatTime = time(NULL);
                 if (curHeartbeatTime - preHeartbeatTime > 60){
@@ -116,6 +229,8 @@ void* dataPackThr(void* args){
     }
     return NULL;
 }
+
+
 
 extern "C"
 JNIEXPORT jstring JNICALL
@@ -160,7 +275,7 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
         mknod(INFO_TUNNEL.c_str(), S_IFIFO | 0666, 0);
     }
 
-    //创建两个线程，读取数据和发送心跳包
+    //Done 创建两个线程，读取数据和发送心跳包
     pthread_t data,heartbeat;
     int data_err,heart_err;
     data_err = pthread_create(&data,NULL,dataPackThr,NULL);

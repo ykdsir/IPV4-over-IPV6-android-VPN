@@ -27,6 +27,12 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = (TextView) findViewById(R.id.sample_text);
         tv.setText("???");
 
+        //TODO 检查网络状态，获取IPV6地址
+
+        //TODO 开启后台线程，调用startBackground()
+
+        //TODO 开启前台计时器刷新界面
+
         //创建IP信息管道
         File extDir = Environment.getExternalStorageDirectory();
         Log.d("ykd",extDir.toString());
