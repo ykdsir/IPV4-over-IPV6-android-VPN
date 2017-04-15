@@ -71,7 +71,6 @@ void readTun(std::string tunnel,char* data,unsigned long length){
         }
     } else{
         LOGD("open tunnel error\n");
-        LOGD(strerror(errno));
     }
 }
 
@@ -106,7 +105,7 @@ void* readVirtualInterfaceThr(void* args){
             setMsg(&sendPkg,IT_REQUEST,strlen(readFromVI),readFromVI);
             if(send(sockfd,&sendPkg, sizeof(Msg),0)){
 //                return strerror(errno);
-                LOGD(strerror(errno));
+                printf("%s\n",strerror(errno));
                 continue;
             }
             sendLength+=length;
@@ -133,7 +132,7 @@ void* heartbeatPackThr(void* args){
         }
         sleep(1);
         curTime = time(NULL);//当前时间
-        interval = curTime - preHeartbeatTime
+        interval = curTime - preHeartbeatTime;
         if(interval > 60){
             socketLive = false;
             return NULL;
@@ -156,7 +155,7 @@ void* heartbeatPackThr(void* args){
             if (counter >= 20){
                 setMsg(&counterHeartbeat,HEARTBEAT,0,NULL);
                 if(send(sockfd,&counterHeartbeat, sizeof(Msg),0) < 0 ) {
-                    LOGD(strerror(errno));
+                    printf("%s\n",strerror(errno));
                     return NULL;
                 }
                 counter = 0;
