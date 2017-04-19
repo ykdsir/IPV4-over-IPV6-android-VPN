@@ -64,62 +64,91 @@ public class MainActivity extends AppCompatActivity {
                 };
                 Thread backgroundthr = new Thread(background);
                 backgroundthr.start();
+
+
+
+                //---------------------------------------------------------------------------------------------------------------------------------------------
+                Runnable readIpPipe = new Runnable() {
+                    @Override
+                    public void run() {
+                        String extDir = getApplicationInfo().dataDir;
+                        Log.d("ykd",extDir.toString());
+                        File ipTunnel = new File(extDir,"ip_pipe");
+                        if(ipTunnel.exists())
+                        {
+                            if(ipTunnel.isDirectory())
+                            {
+                                ipTunnel.delete();
+                                try {
+                                    ipTunnel.createNewFile();
+                                }catch (IOException e){
+                                    Log.d("wjf","IOEexception");
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            try {
+                                ipTunnel.createNewFile();
+                            }catch (IOException e){
+                                Log.d("wjf","IOEexception");
+                            }
+                        }
+                        try {
+                            byte[] buffer = new byte[1024];
+                /*String ostr = new String("hahaha");
+                buffer = ostr.getBytes();
+                FileOutputStream fileOutputStream = new FileOutputStream(ipTunnel);
+                BufferedOutputStream out = new BufferedOutputStream(fileOutputStream);
+                try{
+                    out.write(buffer);
+                }catch (IOException e){
+                    e.printStackTrace();
+                }*/
+
+                            FileInputStream fileInputStream = new FileInputStream(ipTunnel);
+                            BufferedInputStream in = new BufferedInputStream(fileInputStream);
+                            Log.d("wjf", "Buffered input stream opened");
+
+                            int len = 0;
+                            try{
+                                while(len <= 0)
+                                {
+                                    len = in.read(buffer);
+
+
+                                    if(len > 0)
+                                    {
+                                        String ret = new String(buffer);
+                                        ret = ret.substring(0, len);
+                                        Log.d("wjf","return" + ret);
+
+                                    }
+                                }
+                                in.close();
+
+                            }catch (IOException e){
+                                e.printStackTrace();
+                            }
+
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                Thread readIpPipeth = new Thread(readIpPipe);
+                readIpPipeth.start();
             }
         });
         //TODO 开启前台计时器刷新界面
 
         //创建IP信息管道
-        String extDir = getApplicationInfo().dataDir;
-        Log.d("ykd",extDir.toString());
-        File ipTunnel = new File(extDir,"ip_pipe");
-        if(ipTunnel.exists())
-        {
-            if(ipTunnel.isDirectory())
-            {
-                ipTunnel.delete();
-                try {
-                    ipTunnel.createNewFile();
-                }catch (IOException e){
-                    Log.d("wjf","IOEexception");
-                }
-
-            }
-        }
-        else
-        {
-            try {
-                ipTunnel.createNewFile();
-            }catch (IOException e){
-                Log.d("wjf","IOEexception");
-            }
-        }
-
-            FileOutputStream fileOutputStream = null;
-            try {
-            FileInputStream fileInputStream = new FileInputStream(ipTunnel);
-            BufferedInputStream in = new BufferedInputStream(fileInputStream);
-                Log.d("wjf", "Buffered input stream opened");
-                byte[] buffer = new byte[1024];
-                int len = 0;
-                try{
-                    len = in.read(buffer);
-                    in.close();
-                    Log.d("wjf","if");
-                    if(len > 0)
-                    {
-                        String ret = new String(buffer);
-                        ret = ret.substring(0, len);
-                        Log.d("wjf","return" + ret);
-
-                    }
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
 
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+
+
         //TODO 创建流量信息管道 info_pipe ，开启VPN服务，将安卓虚接口写入IP信息管道
 //        out.write(arr, 0, arr.length)
 //        out.flush();
@@ -180,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getMacAddress() {
-        WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         return wifiInfo.getMacAddress();
 

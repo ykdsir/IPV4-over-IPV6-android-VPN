@@ -23,7 +23,7 @@
 
 #define MAXBUFF 1024*128
 #define DATA_SIZE 4096
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"ykd",__VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"background",__VA_ARGS__)
 
 std::string IP_TUNNEL = "/data/user/0/com.test.a4over6_vpn/ip_pipe";
 std::string INFO_TUNNEL = "/data/user/0/com.test.a4over6_vpn/info_pipe";
@@ -181,20 +181,25 @@ void* dataPackThr(void* args){
 
     char recvBuff[MAXBUFF];
     char toWrite[DATA_SIZE];
-    while (1){
-        if(!socketLive)
-            break;
+//    while (1){
+//        if(!socketLive)
+//            break;
         //接收服务器回复
         memset(recvBuff,0,MAXBUFF* sizeof(char));
         memset(toWrite,0,DATA_SIZE);
+        LOGD("before recv");
         length = recv(sockfd,recvBuff,0, sizeof(recvBuff));
+        LOGD("after recv %d",length);
         memcpy(&reciveMsg,recvBuff, sizeof(reciveMsg));
         switch (reciveMsg.type){
             case IP_RESPONCE:
+                LOGD("ip responce");
                 char ip[20],router[20],dns1[20],dns2[20],dns3[20];
                 sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
-                LOGD("wjf",reciveMsg.data);
+
                 sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
+                sprintf(toWrite, "wtf");
+
                 writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
                 //Done 读取前台传递的虚接口，封装102类型报文
                 memset(recvBuff,0,MAXBUFF* sizeof(char));//此时recvBuff暂时用来保存读取虚接口的文件描述符
@@ -206,6 +211,7 @@ void* dataPackThr(void* args){
                 break;
 
             case IT_RESPONCE:
+                LOGD("IT_RESPONCE");
                 sscanf(reciveMsg.data,"%s",toWrite);
                 if(write(virIntFileDescriptor,toWrite,DATA_SIZE) < 0){
                     return strerror(errno);
@@ -217,6 +223,7 @@ void* dataPackThr(void* args){
                 break;
 
             case HEARTBEAT:
+                LOGD("heartbeat");
                 curHeartbeatTime = time(NULL);
                 if (curHeartbeatTime - preHeartbeatTime > 60){
                     socketLive = false;
@@ -226,7 +233,7 @@ void* dataPackThr(void* args){
             default:
                 break;
         }
-    }
+//    }
     return NULL;
 }
 
@@ -258,14 +265,14 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
     if ((sockfd = socket(AF_INET6,SOCK_STREAM,0))<0) {
         returnValue += ("create socket error\n");
     }
-    LOGD("background","before connect \n");
+    LOGD("before connect \n");
     //连接服务器
     int temp = connect(sockfd, (struct sockaddr *) &server, sizeof(server));
     if(temp < 0) {
         returnValue += ("connet to server error\n");
         return env->NewStringUTF(returnValue.c_str());
     }
-    LOGD("background","after connect \n");
+    LOGD("after connect \n");
     //管道是否创建
     if (access(IP_TUNNEL.c_str(), F_OK) == -1)
     {
@@ -286,6 +293,7 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
     }
     pthread_join(data, NULL);
     pthread_join(heartbeat, NULL);
+
     return env->NewStringUTF(returnValue.c_str());
 }
 
