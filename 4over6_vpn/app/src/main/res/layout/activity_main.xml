@@ -6,14 +6,74 @@
     android:layout_height="match_parent"
     tools:context="com.test.a4over6_vpn.MainActivity">
 
-    <TextView
-        android:id="@+id/sample_text"
-        android:layout_width="wrap_content"
+    <TableLayout
+        android:orientation="horizontal"
+        android:layout_width="368dp"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="8dp">
+        <!--android:stretchColumns="1"-->
+
+        <TableRow
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/IPv6AddressButton"
+                android:text="IPv6 Address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/IPv6AddressTextView"
+                android:hint="Your IPv6 Address"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:isScrollContainer="true" />
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:text="Mac Address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/MacTextView"
+                android:hint="Your MAC Address"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:text="Network Status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/NetworkStatusTextView"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Your Network Status" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </TableRow>
+        <TableRow>
+            <Button
+                android:id="@+id/ConnectButton"
+                android:text="Connect"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+        </TableRow>
+    </TableLayout>
 
 </android.support.constraint.ConstraintLayout>

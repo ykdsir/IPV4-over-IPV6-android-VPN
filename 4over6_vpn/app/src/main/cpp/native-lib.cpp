@@ -25,8 +25,8 @@
 #define DATA_SIZE 4096
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"ykd",__VA_ARGS__)
 
-std::string IP_TUNNEL = "/com.test.a4over6_vpn/ip_pipe";
-std::string INFO_TUNNEL = "/com.test.a4over6_vpn/info_pipe";
+std::string IP_TUNNEL = "/data/user/0/com.test.a4over6_vpn/ip_pipe";
+std::string INFO_TUNNEL = "/data/user/0/com.test.a4over6_vpn/info_pipe";
 
 struct Msg{
     int length;
@@ -193,6 +193,7 @@ void* dataPackThr(void* args){
             case IP_RESPONCE:
                 char ip[20],router[20],dns1[20],dns2[20],dns3[20];
                 sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
+                LOGD("wjf",reciveMsg.data);
                 sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
                 writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
                 //Done 读取前台传递的虚接口，封装102类型报文
@@ -257,13 +258,14 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
     if ((sockfd = socket(AF_INET6,SOCK_STREAM,0))<0) {
         returnValue += ("create socket error\n");
     }
+    LOGD("background","before connect \n");
     //连接服务器
     int temp = connect(sockfd, (struct sockaddr *) &server, sizeof(server));
     if(temp < 0) {
         returnValue += ("connet to server error\n");
         return env->NewStringUTF(returnValue.c_str());
     }
-
+    LOGD("background","after connect \n");
     //管道是否创建
     if (access(IP_TUNNEL.c_str(), F_OK) == -1)
     {
