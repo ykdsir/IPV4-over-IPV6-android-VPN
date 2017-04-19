@@ -110,19 +110,16 @@ public class MainActivity extends AppCompatActivity {
                             FileInputStream fileInputStream = new FileInputStream(ipTunnel);
                             BufferedInputStream in = new BufferedInputStream(fileInputStream);
                             Log.d("wjf", "Buffered input stream opened");
-
                             int len = 0;
                             try{
                                 while(len <= 0)
                                 {
                                     len = in.read(buffer);
-
-
                                     if(len > 0)
                                     {
                                         String ret = new String(buffer);
                                         ret = ret.substring(0, len);
-                                        Log.d("wjf","return" + ret);
+                                        Log.d("wjf","ipv4 address and dns: " + ret);
 
                                     }
                                 }
@@ -195,17 +192,15 @@ public class MainActivity extends AppCompatActivity {
             statusTextView.setText("You are not connected by WiFi\n");
             return;
         }*/
-
         statusTextView.setText("You are connected by WiFi\n");
 
         String macAddr = getMacAddress();
         TextView macTextView = (TextView) findViewById(R.id.MacTextView);
         macTextView.setText(macAddr);
-
         String ipv6Addr = getIPv6Address();
         TextView textView = (TextView)findViewById(R.id.IPv6AddressTextView);
         textView.setText(ipv6Addr);
-        Log.d("CYZ_IPAddress", ipv6Addr);
+        Log.d("wjf", ipv6Addr);
     }
 
     private String getMacAddress() {
@@ -225,18 +220,22 @@ public class MainActivity extends AppCompatActivity {
                 for(Enumeration<InetAddress>enumAddress = networkInterface.getInetAddresses();enumAddress.hasMoreElements();)
                 {
                     InetAddress inetAddress = enumAddress.nextElement();
-                    if(inetAddress instanceof Inet6Address
-                            && inetAddress.isSiteLocalAddress()
-                            && !inetAddress.isLoopbackAddress()
-                            && !isReservedAddr(inetAddress))
-                    {
-                        String ipAddr = inetAddress.getHostAddress();
-                        String ipAddripAddr = null;
-                        int index = ipAddr.indexOf('%');
-                        if (index > 0) {
-                            ipAddripAddr = ipAddr.substring(0, index);
-                        }
-                        return ipAddr;
+                    //TODO 检查原来的函数逻辑
+//                    if(inetAddress instanceof Inet6Address
+//                            && inetAddress.isSiteLocalAddress()
+//                            && !inetAddress.isLoopbackAddress()
+//                            && !isReservedAddr(inetAddress))
+//                    {
+//                        String ipAddr = inetAddress.getHostAddress();
+//                        String ipAddripAddr = null;
+//                        int index = ipAddr.indexOf('%');
+//                        if (index > 0) {
+//                            ipAddripAddr = ipAddr.substring(0, index);
+//                        }
+//                        return ipAddr;
+//                    }
+                    if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress()) {
+                        return inetAddress.getHostAddress();
                     }
                 }
             }
@@ -244,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.wtf("WIFI_IP", "Unable to NetworkInterface.getNetworkInterfaces()");
         }
-        return null;
+        return "";
     }
     private static boolean isReservedAddr(InetAddress inetAddr) {
         if (inetAddr.isAnyLocalAddress() || inetAddr.isLinkLocalAddress()

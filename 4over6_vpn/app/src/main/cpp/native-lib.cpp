@@ -167,29 +167,31 @@ void* heartbeatPackThr(void* args){
 }
 
 void* dataPackThr(void* args){
-    printf("data pack thread\n");
+    LOGD("data pack thread\n");
 
     Msg ipRequest,reciveMsg;
     long length;
     pthread_t virIntThread;
+    char recvBuff[MAXBUFF];
+    char toWrite[DATA_SIZE];
 
     //发送IP请求
     setMsg(&ipRequest,IP_REQUEST,0,NULL);
     if(send(sockfd,&ipRequest, sizeof(Msg),0)<0){
-        return strerror(errno);
+        LOGD("%s\n", strerror(errno));
     }
 
-    char recvBuff[MAXBUFF];
-    char toWrite[DATA_SIZE];
-//    while (1){
-//        if(!socketLive)
-//            break;
+    while (1){
+        if(!socketLive)
+            break;
         //接收服务器回复
         memset(recvBuff,0,MAXBUFF* sizeof(char));
         memset(toWrite,0,DATA_SIZE);
-        LOGD("before recv");
-        length = recv(sockfd,recvBuff,0, sizeof(recvBuff));
-        LOGD("after recv %d",length);
+//        LOGD("before recv");
+        length = recv(sockfd,recvBuff, sizeof(recvBuff),MSG_DONTWAIT|MSG_PEEK);
+        if(length<0)
+            continue;
+//        LOGD("after recv %d",length);
         memcpy(&reciveMsg,recvBuff, sizeof(reciveMsg));
         switch (reciveMsg.type){
             case IP_RESPONCE:
@@ -198,8 +200,7 @@ void* dataPackThr(void* args){
                 sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
 
                 sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
-                sprintf(toWrite, "wtf");
-
+                LOGD("recieve: %s",reciveMsg.data);
                 writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
                 //Done 读取前台传递的虚接口，封装102类型报文
                 memset(recvBuff,0,MAXBUFF* sizeof(char));//此时recvBuff暂时用来保存读取虚接口的文件描述符
@@ -233,7 +234,7 @@ void* dataPackThr(void* args){
             default:
                 break;
         }
-//    }
+    }
     return NULL;
 }
 
@@ -265,7 +266,6 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
     if ((sockfd = socket(AF_INET6,SOCK_STREAM,0))<0) {
         returnValue += ("create socket error\n");
     }
-    LOGD("before connect \n");
     //连接服务器
     int temp = connect(sockfd, (struct sockaddr *) &server, sizeof(server));
     if(temp < 0) {
