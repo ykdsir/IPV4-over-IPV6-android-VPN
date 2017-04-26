@@ -1,10 +1,12 @@
 package com.test.a4over6_vpn;
 
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Button;
 import android.net.ConnectivityManager;
@@ -31,6 +33,13 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 public class MainActivity extends AppCompatActivity {
+    private static String[] info;
+    private static String ipv4Addr;
+    private static String router;
+    private static String dns1;
+    private static String dns2;
+    private static String dns3;
+    private static String sockfd;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -52,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         connectButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view)
             {
-                Toast.makeText(MainActivity.this,"kai qi vpn",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this,"kai qi background",Toast.LENGTH_LONG).show();
                 Runnable background = new Runnable(){
                     public void run()
                     {
@@ -119,7 +128,30 @@ public class MainActivity extends AppCompatActivity {
                                     {
                                         String ret = new String(buffer);
                                         ret = ret.substring(0, len);
-                                        Log.d("wjf","ipv4 address and dns: " + ret);
+                                        info = ret.split(" ");
+                                        if (info.length == 6) {
+                                            ipv4Addr = info[0];
+                                            if (ipv4Addr.split("\\.").length == 4) {
+                                                router   = info[1];
+                                                dns1     = info[2];
+                                                dns2     = info[3];
+                                                dns3     = info[4];
+                                                sockfd   = info[5];
+                                                EditText editText = (EditText) findViewById(R.id.editText);
+                                                editText.append(ipv4Addr + "\n");
+                                                editText.append(router + "\n");
+                                                editText.append(dns1 + "\n");
+                                                editText.append(dns2 + "\n");
+                                                editText.append(dns3 + "\n");
+                                                Log.d("wjf", "Will start VPN now");
+                                                startVPNService();
+                                            } else {
+                                                Log.d("wjf","wrong"+ ret);
+                                            }
+                                        } else {
+                                            Log.e("wjf", "Wrong "+ret);
+                                        }
+
 
                                     }
                                 }
@@ -252,6 +284,37 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+    private boolean startVPNService(){
+        Log.d("wjf","start");
+        Intent intent = VpnService.prepare(this);
+        if(intent != null)
+        {
+            startActivityForResult(intent , 0);
+        }
+        else
+        {
+            Log.d("wjf","no remind");
+            onActivityResult(0,RESULT_OK,null);
+        }
+
+        return true;
+    }
+    protected void onActivityResult(int request,int result,Intent data)
+    {
+        if(result == RESULT_OK)
+        {
+            Log.d("wjf","result_ok");
+            Intent intent = new Intent(MainActivity.this,MyVPNService.class);
+            intent.putExtra("ipv4Addr", ipv4Addr);
+            intent.putExtra("router", router);
+            intent.putExtra("dns1", dns1);
+            intent.putExtra("dns2", dns2);
+            intent.putExtra("dns3", dns3);
+            intent.putExtra("sockfd", sockfd);
+            Log.d("wjf","startService()");
+            startService(intent);
+        }
     }
 
 
