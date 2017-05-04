@@ -32,9 +32,6 @@ struct Msg{
     int length;
     char type;
     char data[DATA_SIZE];
-    Msg(){
-        memset(data,0,DATA_SIZE);
-    }
 };
 
 int sockfd;//套接字接口
@@ -42,13 +39,13 @@ time_t preHeartbeatTime = -1;//上一次心跳时间
 time_t curHeartbeatTime = -1;//当前心跳时间
 bool socketLive = true;//socket是否存活
 int virIntFileDescriptor = -1;//虚接口描述符
-long recvLength = 0;
-long recvTotalLength = 0;
-long recvCount = 0;
-long sendLength = 0;
-long sendTotalLength = 0;
-long sendCount = 0;
-
+double recvLength = 0;
+double recvTotalLength = 0;
+double recvCount = 0;
+double sendLength = 0;
+double sendTotalLength = 0;
+double sendCount = 0;
+bool  IPTunnelChanged = false;
 
 //设置Msg结构体的信息
 void setMsg(Msg* msg,char type,int data_length,char* data ){
@@ -56,10 +53,10 @@ void setMsg(Msg* msg,char type,int data_length,char* data ){
     if (data == NULL){
         data_length = 0;
     } else{
-        memcpy(msg->data,0, sizeof(msg->data));
-        memcpy(msg->data,data,(data_length));
+        memset(msg->data,0, sizeof(msg->data));
+        memcpy(msg->data,data,(unsigned long)(data_length));
     }
-    msg->length = 5 + data_length;
+    msg->length = data_length+5;
 }
 
 //读管道
@@ -95,22 +92,28 @@ int writeTun(std::string tunnel,char* data,unsigned long length){
 //读虚接口
 void* readVirtualInterfaceThr(void* args){
     char readFromVI[DATA_SIZE];
+    long length;
+    Msg sendPkg;
+    LOGD("virtual descriptor: %d\n",virIntFileDescriptor);
     while (1){
-        if(!socketLive)
+        if(!socketLive) {
             break;
+        }
         memset(readFromVI,0,DATA_SIZE);
-        long length = read(virIntFileDescriptor,readFromVI,DATA_SIZE);
+        length = read(virIntFileDescriptor,readFromVI, sizeof(readFromVI));
         if(length > 0){
-            Msg sendPkg;
-            setMsg(&sendPkg,IT_REQUEST,strlen(readFromVI),readFromVI);
-            if(send(sockfd,&sendPkg, sizeof(Msg),0)){
-//                return strerror(errno);
-                printf("%s\n",strerror(errno));
+            LOGD("read from IV %s length: %ld\n",readFromVI,length);
+//            setMsg(&sendPkg,IT_REQUEST,strlen(readFromVI),readFromVI);
+            setMsg(&sendPkg,IT_REQUEST,length,readFromVI);
+//            LOGD("length: %d\n",sendPkg.length);
+            if((send(sockfd,&sendPkg, sizeof(Msg),0))<0){
+                LOGD("send 102 %s\n",strerror(errno));
                 continue;
-            }
+            };
             sendLength+=length;
             sendTotalLength += length;
             ++sendCount;
+//            return NULL;
         }
     }
     return NULL;
@@ -123,7 +126,7 @@ void* heartbeatPackThr(void* args){
     Msg counterHeartbeat;
     time_t curTime;
     char toFront[MAXBUFF];//传递给前台的相关数据
-    long uploadSpeed = 0,downloadSpeed = 0;
+    double uploadSpeed = 0,downloadSpeed = 0;
     time_t interval;
     while (1){
         if (!socketLive){
@@ -143,11 +146,11 @@ void* heartbeatPackThr(void* args){
              * 上传、下载速度
              * 上传总流量和包数
              * 下载总流量和包数
-             * IPV4，IPV6地址？？
              */
             uploadSpeed =(sendLength/1024)/interval;
             downloadSpeed = (recvLength/1024)/interval;
-            sprintf(toFront,"%ld %ld %ld %ld %ld %ld",uploadSpeed,downloadSpeed,sendTotalLength,sendCount,recvTotalLength,recvCount);
+            sprintf(toFront,"%lf %lf %lf %lf %lf %lf",uploadSpeed,downloadSpeed,sendTotalLength,sendCount,recvTotalLength,recvCount);
+//            LOGD("%lf %lf %ld %ld %ld %ld",uploadSpeed,downloadSpeed,sendTotalLength,sendCount,recvTotalLength,recvCount);
             writeTun(INFO_TUNNEL,toFront,strlen(toFront));//将信息写入流量信息管道
             sendLength = 0;
             recvLength = 0;
@@ -177,7 +180,7 @@ void* dataPackThr(void* args){
 
     //发送IP请求
     setMsg(&ipRequest,IP_REQUEST,0,NULL);
-    if(send(sockfd,&ipRequest, sizeof(Msg),0)<0){
+    if((length = send(sockfd,&ipRequest, sizeof(Msg),0))<0){
         LOGD("%s\n", strerror(errno));
     }
 
@@ -186,40 +189,51 @@ void* dataPackThr(void* args){
             break;
         //接收服务器回复
         memset(recvBuff,0,MAXBUFF* sizeof(char));
+        memset(&reciveMsg,0, sizeof(Msg));
         memset(toWrite,0,DATA_SIZE);
 //        LOGD("before recv");
-        length = recv(sockfd,recvBuff, sizeof(recvBuff),MSG_DONTWAIT|MSG_PEEK);
+        length = recv(sockfd,recvBuff, sizeof(recvBuff),0);
         if(length<0)
-            continue;
-//        LOGD("after recv %d",length);
+            if ((errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN))
+                continue;
+            else
+                return NULL;
+        LOGD("after recv %ld",length);
+//        continue;
         memcpy(&reciveMsg,recvBuff, sizeof(reciveMsg));
         switch (reciveMsg.type){
             case IP_RESPONCE:
-                LOGD("ip responce");
+                LOGD("ip responce\n");
                 char ip[20],router[20],dns1[20],dns2[20],dns3[20];
                 sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
 
                 sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
-                LOGD("recieve: %s",reciveMsg.data);
+                LOGD("recieve: %s\n",reciveMsg.data);
                 writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
+                IPTunnelChanged = true;
                 //Done 读取前台传递的虚接口，封装102类型报文
                 memset(recvBuff,0,MAXBUFF* sizeof(char));//此时recvBuff暂时用来保存读取虚接口的文件描述符
+//                LOGD("before read: %s\n",recvBuff);
+                sleep(1);
                 readTun(IP_TUNNEL,recvBuff,MAXBUFF);
+                LOGD("after read: %s\n",recvBuff);
                 sscanf(recvBuff,"%d",&virIntFileDescriptor);
-
+                LOGD("virIntFileDescriptor: %d\n",virIntFileDescriptor);
+                memset(recvBuff,0,MAXBUFF* sizeof(char));
+                writeTun(IP_TUNNEL,recvBuff,strlen(recvBuff));
                 pthread_create(&virIntThread,NULL,readVirtualInterfaceThr,NULL);
-                pthread_join(virIntThread,NULL);
                 break;
 
             case IT_RESPONCE:
                 LOGD("IT_RESPONCE");
-                sscanf(reciveMsg.data,"%s",toWrite);
-                if(write(virIntFileDescriptor,toWrite,DATA_SIZE) < 0){
+//                sscanf(recvBuff,"%s",toWrite);
+                if(write(virIntFileDescriptor,reciveMsg.data, sizeof(reciveMsg.data)) < 0){
+                    LOGD("write virtunnel wrong %s\n",strerror(errno));
                     return strerror(errno);
                 } else{
                     ++recvCount;
-                    recvLength += strlen(toWrite);
-                    recvTotalLength += strlen(toWrite);
+                    recvLength += length;
+                    recvTotalLength += length;
                 }
                 break;
 
@@ -238,17 +252,14 @@ void* dataPackThr(void* args){
     return NULL;
 }
 
-
-
 extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_test_a4over6_1vpn_MainActivity_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+JNIEXPORT jboolean JNICALL
+Java_com_test_a4over6_1vpn_MainActivity_IsIPTunnelChanged(JNIEnv *env, jobject instance) {
+    jboolean tRet = JNI_FALSE;
+    if(IPTunnelChanged)
+        tRet = JNI_TRUE;
+    return tRet;
 }
-
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject instance) {
@@ -292,7 +303,7 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
         printf("create thraed error\n");
     }
     pthread_join(data, NULL);
-    pthread_join(heartbeat, NULL);
+//    pthread_join(heartbeat, NULL);
 
     return env->NewStringUTF(returnValue.c_str());
 }
