@@ -63,6 +63,11 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+            <EditText
+                android:id="@+id/editText"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </TableRow>
         <TableRow>
@@ -75,15 +80,76 @@
                 />
         </TableRow>
         <TableRow>
-            <EditText
-                android:id="@+id/editText"
+            <Button
+                android:text="Upload Speed: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/UploadSpeed"
+                android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:inputType="textMultiLine"
-                android:ems="10"
-                android:editable="true"
-                android:enabled="false"/>
+                android:layout_height="wrap_content"
+                android:hint="UploadSpeed" />
+        </TableRow>
+        <TableRow>
+            <Button
+                android:text="download speed: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/DownloadSpeed"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="DownloadSpeed" />
+        </TableRow>
+        <TableRow>
+            <Button
+                android:text="Upload Total Bytes: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/UploadTotalLength"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Upload Total pkg" />
+        </TableRow>
+        <TableRow>
+            <Button
+                android:text="Upload Total Pkg: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/UploadPkg"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Upload Total pkg" />
+        </TableRow>
+        <TableRow>
+            <Button
+                android:text="Download Total Bytes: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/DownloadTotalLength"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Upload Total pkg" />
+        </TableRow>
+        <TableRow>
+            <Button
+                android:text="Download Total pkg: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/DownloadPkg"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Download Total pkg" />
         </TableRow>
     </TableLayout>
 

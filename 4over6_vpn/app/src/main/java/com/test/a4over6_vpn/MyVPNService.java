@@ -96,14 +96,16 @@ public class MyVPNService extends VpnService{
     }
     private void writeFD(int fd)
     {
-        Log.d("fd","fd"+fd);
+        Log.d("fd","fd "+fd);
         String extDir = getApplicationInfo().dataDir;
         Log.d("wjf","extdir"+extDir.toString());
         File ipTunnel = new File(extDir,"ip_pipe");
         try{
             FileOutputStream fileOutputStream = new FileOutputStream(ipTunnel);
+            Log.d("wjf", "ipTunnel: "+ipTunnel.toString());
             BufferedOutputStream out = new BufferedOutputStream(fileOutputStream);
             String fdstr = String.valueOf(fd);
+            Log.d("wjf", "fdstr: "+fdstr);
             try{
                 out.write(fdstr.getBytes());
                 out.flush();
