@@ -9,20 +9,24 @@
 struct IPADDR ipaddr[ADDR_SIZE];//全局变量的地址池
 User_Manager manager;
 fd_set readfds, testfds;//select集合
+int tun_fd;
 static void *keepalive(void* args);
+static void *read_tun(void* args);
 void send_ip_responce(int sockfd,int addr);
 void send_104_package(int sockfd);
 int handle_100(int sockfd);
 int handle_104(int sockfd);
+void handle_102(Msg,msg);
 char dns_addr[] = "202.38.120.242 8.8.8.8 202.106.0.20";
 char ip_base[] = "13.8.0.";
 int main()
 {
 	//TODO:创建IPV6套接字，把该套接字加入Select模型字符集;
-	int server_sockfd, client_sockfd, tun_fd;
-	socklen_t server_len, client_len;
+	int server_sockfd, client_sockfd;
+	socklen_t server_len, client_len, tun_len;
 	struct sockaddr_in6 server_address;
 	struct sockaddr_in6 client_address;
+	struct sockaddr_in tun_address;
 	int result;
 	char buff[MAXBUF];
 
@@ -40,11 +44,17 @@ int main()
 	FD_ZERO(&readfds);
 	FD_SET(server_sockfd, &readfds);
 	//TODO:创建tun虚接口
-	tun_fd = socket(AF_INET, SOCK_STREAM, 0);//tun 虚接口
+	tun_fd = socket(AF_INET, SOCK_RAW, IPPROTO_IP);//tun 虚接口
+	memset(&tun_address, 0, sizeof(tun_address));
+	tun_address.sin_family = AF_INET;
+	inet_pton(AF_INET, "13.0.8.1", (void *)&tun_address.sin_addr);
+	tun_address.sin_port = htons(9735);
+	bind(tun_fd,(struct sockaddr *)&tun_address, sizeof(tun_address));
+	ipaddr[0].status = 1;
 	//TODO:创建客户信息表和地址池
 	for(int i=0; i<ADDR_SIZE; i++){
 		ipaddr[i].status = 0;
-		sprintf(ipaddr[i].addr,"%s%d",ip_base,i);
+		sprintf(ipaddr[i].addr,"%s%d",ip_base,i+1);
 	}
 	//TODO:获取服务器DNS地址
 
@@ -110,7 +120,9 @@ int main()
 								//TODO:回应101报文
 								handle_100(fd);
 								break;
-							case 101 :
+							case 102 :
+								//TODO:上网请求消息
+								handle_102(msg);
 								break;
 							case HEARTBEAT :
 								//TODO:keepalive消息
@@ -159,6 +171,12 @@ static void *keepalive(void* args){
 	return 0;
 } 
 
+static void *read_tun(void* args){
+	while(1){
+		//char buff[]
+		//recv(tun_fd,)
+	}
+}
 
 void send_ip_responce(int sockfd,int addr){
 	char data[4096];
@@ -200,6 +218,18 @@ void send_104_package(int sockfd){
 	memset(msg.data,0, sizeof(msg.data));
 	msg.length = sizeof(msg);
 	write(sockfd,&msg,msg.length);
+}
+
+void handle_102(Msg msg){
+	printf("Message -> data: %s\n",msg.data);
+	IP_HEAD iphead;
+	iphead = *(IP_HEAD*)msg.data;
+	in_addr dest = *(in_addr*)&iphead.dwIPDes;
+	struct sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_addr = dest; //IP
+	addr.sin_port = 8888; //端口，IP层端口可随意填
+	sendto(tun_fd, &msg.data, sizeof(msg.data), 0, (struct sockaddr * )&addr, sizeof(addr));
 }
 
 void User_Manager::add_user(User_Info_Table user){

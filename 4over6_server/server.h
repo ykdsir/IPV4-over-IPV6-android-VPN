@@ -49,3 +49,25 @@ public:
 	void del_user(int sockfd);
 	User_Info_Table *find_user(int sockfd);
 };
+
+//IP首部
+typedef struct tIPPackHead
+{
+
+    char ver_hlen;      //IP协议版本和IP首部长度。高4位为版本，低4位为首部的长度(单位为4 bytes)
+    char byTOS;       //服务类型
+    char wPacketLen[2]; //IP包总长度。包括首部，单位为byte。[Big endian]
+    char wSequence[2];    //标识，一般每个IP包的序号递增。[Big endian]
+
+    union
+    {
+    	char Flags[2]; //标志
+    	char FragOf[2];//分段偏移
+    };
+    char byTTL;         //生存时间
+    char byProtocolType; //协议类型，见PROTOCOL_TYPE定义
+    char wHeadCheckSum[2];    //IP首部校验和[Big endian]
+    char dwIPSrc[4];         //源地址
+    char dwIPDes[4];         //目的地址
+    char Options;          //选项
+} IP_HEAD;
