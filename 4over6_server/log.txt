@@ -1,0 +1,229 @@
+User_Manager::User_Manager
+dns:127.0.0.1
+----keepalive thread start-----
+----read tun thread start-----
+connect request:
+adding client on fd 4
+connection from 2402:f000:2:c801:8907:70cf:617c:cb0e, port 60767
+User_Manager::add_user
+recvmsg type : 100
+alloc : addr 13.8.0.2
+----send_ip_responce-----
+*User_Manager::find_user : 4
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000044fffffff70b40004011fffffff37a0d080002ffffffca2678fffffff2ffffff9666003500305711ffffffc2ffffffe0010000010000000000000273740762726f77736572047669766f03636f6d02636e0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffff76140004011fffffff3310d080002ffffffca2678fffffff2fffffffd5e00350023ffffffbaffffffc6ffffffb6180100000100000000000005626169647503636f6d0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000044fffffff8ffffffff4000401124ffffff900d0800020808080866ffffff8a00350030ffffffb9fffffff6ffffffc2ffffffe0010000010000000000000273740762726f77736572047669766f03636f6d02636e0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffff9554000401124470d08000208080808072b00350023ffffffe403ffffffb6180100000100000000000005626169647503636f6d0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffff9ffffffb940004011fffffff0ffffffd90d080002ffffffca2678fffffff2ffffffd02500350023fffffff6fffffff4ffffffa7230100000100000000000005626169647503636f6d0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000044fffffffa2c4000401168fffffff40d080002ffffffca6a001423510035003042ffffffc1ffffffc2ffffffe0010000010000000000000273740762726f77736572047669766f03636f6d02636e0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffffaffffff824000401168ffffffab0d080002ffffffca6a00142109003500230fffffffb7ffffffb6180100000100000000000005626169647503636f6d0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffffbffffffad4000401121ffffffef0d08000208080808ffffffd6ffffffde003500232345ffffffa7230100000100000000000005626169647503636f6d0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+send message  104 to 4
+recvmsg type : 102
+102 Message -> data: E
+45000044fffffff70c40004011fffffff3790d080002ffffffca2678fffffff2ffffff9666003500305711ffffffc2ffffffe0010000010000000000000273740762726f77736572047669766f03636f6d02636e0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 104
+*User_Manager::find_user : 4
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffffcffffffda4000401166530d080002ffffffca6a0014ffffff9affffffce00350023ffffffa4ffffffe6ffffffa7230100000100000000000005626169647503636f6d0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffff76240004011fffffff3300d080002ffffffca2678fffffff2fffffffd5e00350023ffffffbaffffffc6ffffffb6180100000100000000000005626169647503636f6d0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000044fffffff9004000401124ffffff8f0d0800020808080866ffffff8a00350030ffffffb9fffffff6ffffffc2ffffffe0010000010000000000000273740762726f77736572047669766f03636f6d02636e0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffff9564000401124460d08000208080808072b00350023ffffffe403ffffffb6180100000100000000000005626169647503636f6d0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffff9ffffffba40004011fffffff0ffffffd80d080002ffffffca2678fffffff2ffffffd02500350023fffffff6fffffff4ffffffa7230100000100000000000005626169647503636f6d0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000044fffffffa2d4000401168fffffff30d080002ffffffca6a001423510035003042ffffffc1ffffffc2ffffffe0010000010000000000000273740762726f77736572047669766f03636f6d02636e0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffffaffffff834000401168ffffffaa0d080002ffffffca6a00142109003500230fffffffb7ffffffb6180100000100000000000005626169647503636f6d0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffffbffffffae4000401121ffffffee0d08000208080808ffffffd6ffffffde003500232345ffffffa7230100000100000000000005626169647503636f6d0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037fffffffcffffffdb4000401166520d080002ffffffca6a0014ffffff9affffffce00350023ffffffa4ffffffe6ffffffa7230100000100000000000005626169647503636f6d0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037025340004011ffffffe8400d080002ffffffca2678fffffff2792800350023ffffffee4d06ffffffc80100000100000000000005626169647503636f6d0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+send message  104 to 4
+recvmsg type : 102
+102 Message -> data: E
+4500003704484000401119550d08000208080808ffffffbbfffffffd00350023ffffffdeffffff8106ffffffc80100000100000000000005626169647503636f6d0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+4500003704484000401119550d080002080808087affffffb400350023ffffff957affffff91180100000100000000000005626169647503636f6d0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 104
+*User_Manager::find_user : 4
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+4500003704ffffffab40004011ffffffe5ffffffe80d080002ffffffca2678fffffff26b1f00350023fffffff3ffffffbe0f600100000100000000000005626169647503636f6d0000010001
+dest addr: 202.38.120.242
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+450000370574400040115dffffffba0d080002ffffffca6a001467280035002378ffffffe806ffffffc80100000100000000000005626169647503636f6d0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+450000370574400040115dffffffba0d080002ffffffca6a001466ffffff8000350023ffffffef3fffffff91180100000100000000000005626169647503636f6d0000010001
+dest addr: 202.106.0.20
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+4500003706ffffffa04000401116fffffffd0d08000208080808ffffff9affffff9100350023fffffff7550f600100000100000000000005626169647503636f6d0000010001
+dest addr: 8.8.8.8
+recvmsg type : 0
+unknown message type
+recvmsg type : 0
+unknown message type
+recvmsg type : 102
+102 Message -> data: E
+45000037025540004011ffffffe83e0d080002ffffffca2678fffffff2ffffff8cffffff870035002350ffffff9effffff9118010000010000000000000562616964750
