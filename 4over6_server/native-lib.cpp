@@ -131,6 +131,7 @@ void* heartbeatPackThr(void* args){
         interval = curTime - preHeartbeatTime;
         if(interval > 60){
             socketLive = false;
+            printf("heart beat package socketlive failed!\n");
             return NULL;
         } else{
             uploadSpeed = downloadSpeed = 0;
@@ -190,24 +191,24 @@ void* dataPackThr(void* args){
         memcpy(&reciveMsg,recvBuff, sizeof(reciveMsg));
         switch (reciveMsg.type){
             case IP_RESPONCE:
-                // printf("ip responce");
+                printf("ip responce\n");
                 char ip[20],router[20],dns1[20],dns2[20],dns3[20];
                 sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
 
                 sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
-                printf("recieve: %s",reciveMsg.data);
-                // writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
+                printf("recieve: %s\n",reciveMsg.data);
+                //writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
                 //Done 读取前台传递的虚接口，封装102类型报文
-                // memset(recvBuff,0,MAXBUFF* sizeof(char));//此时recvBuff暂时用来保存读取虚接口的文件描述符
-                // readTun(IP_TUNNEL,recvBuff,MAXBUFF);
-                // sscanf(recvBuff,"%d",&virIntFileDescriptor);
+                memset(recvBuff,0,MAXBUFF* sizeof(char));//此时recvBuff暂时用来保存读取虚接口的文件描述符
+                //readTun(IP_TUNNEL,recvBuff,MAXBUFF);
+                sscanf(recvBuff,"%d",&virIntFileDescriptor);
 
-                // pthread_create(&virIntThread,NULL,readVirtualInterfaceThr,NULL);
-                // pthread_join(virIntThread,NULL);
+                pthread_create(&virIntThread,NULL,readVirtualInterfaceThr,NULL);
+                pthread_join(virIntThread,NULL);
                 break;
 
             case IT_RESPONCE:
-                // printf("IT_RESPONCE");
+                 printf("IT_RESPONCE\n");
                 sscanf(reciveMsg.data,"%s",toWrite);
                 if(write(virIntFileDescriptor,toWrite,DATA_SIZE) < 0){
                     return strerror(errno);
@@ -219,7 +220,7 @@ void* dataPackThr(void* args){
                 break;
 
             case HEARTBEAT:
-                // printf("heartbeat");
+                printf("heartbeat\n");
                 curHeartbeatTime = time(NULL);
                 if (curHeartbeatTime - preHeartbeatTime > 60){
                     socketLive = false;
@@ -257,20 +258,19 @@ int main(){
     }
      printf("after connect \n");
     //管道是否创建
-  //   string msg = "hello,world";
-  //   std::string msg = "abcdeg";
-   //  write(sockfd,msg.c_str(),sizeof(msg.c_str()));
+     //std::string msg = "hello world! test write!";
+     //write(sockfd,msg.c_str(),sizeof(msg.c_str()));
 
     //Done 创建两个线程，读取数据和发送心跳包
     pthread_t data,heartbeat;
     int data_err,heart_err;
     data_err = pthread_create(&data,NULL,dataPackThr,NULL);
-    heart_err = 0;//pthread_create(&heartbeat,NULL,heartbeatPackThr,NULL);
+    heart_err = pthread_create(&heartbeat,NULL,heartbeatPackThr,NULL);
     if(data_err!=0 || heart_err!=0){
         printf("create thraed error\n");
     }
     pthread_join(data, NULL);
-    //pthread_join(heartbeat, NULL);
+    pthread_join(heartbeat, NULL);
 
     return 0;
 }
