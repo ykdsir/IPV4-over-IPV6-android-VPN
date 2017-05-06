@@ -111,6 +111,7 @@ public class MyVPNService extends VpnService{
                 out.flush();
                 out.close();
                 Log.d("wjf","have written down");
+                setFD();
             }
             catch (IOException e)
             {
@@ -125,4 +126,5 @@ public class MyVPNService extends VpnService{
 
     }
 
+    public native void setFD();
 }
