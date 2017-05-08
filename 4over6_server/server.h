@@ -16,7 +16,17 @@
 #include<sys/ioctl.h>
 #include <fcntl.h>
 #include <iostream>
-
+#include <linux/if.h>
+#include <linux/if_tun.h>
+#include <net/route.h>
+#define MAXBUF 1024
+#define ADDR_SIZE 128 //address area size.
+#define HBCOUNT 20 //Heart Beat initial count.
+#define IP_REQUEST 100
+#define IP_RESPONCE 101
+#define IT_REQUEST 102
+#define IT_RESPONCE 103
+#define HEARTBEAT 104
 
 struct Msg
 {
@@ -24,6 +34,7 @@ struct Msg
 	char type;		//类型
 	char data[4096];	//数据段
 };
+
 struct User_Info_Table 		//客户信息表
 {
 	int fd; 						//套接字描述符
@@ -44,11 +55,13 @@ struct User_Info_Table 		//客户信息表
 		this->pNext = user.pNext;
 	}
 };
+
 struct IPADDR
 {
 	char addr[32];		//IP地址
 	int status;			//标志位
 };
+
 class User_Manager
 {
 public:
@@ -59,35 +72,15 @@ public:
 	void add_user(User_Info_Table user);
 	void del_user(int sockfd);
 	User_Info_Table *find_user(int sockfd);
+    User_Info_Table *find_user(in_addr v4addr);
 };
 
-//IP首部
-//typedef struct tIPPackHead
-//{
-//
-//    char ver_hlen;      //IP协议版本和IP首部长度。高4位为版本，低4位为首部的长度(单位为4 bytes)
-//    char byTOS;       //服务类型
-//    char wPacketLen[2]; //IP包总长度。包括首部，单位为byte。[Big endian]
-//    char wSequence[2];    //标识，一般每个IP包的序号递增。[Big endian]
-//
-//    union
-//    {
-//    	char Flags[2]; //标志
-//    	char FragOf[2];//分段偏移
-//    };
-//    char byTTL;         //生存时间
-//    char byProtocolType; //协议类型，见PROTOCOL_TYPE定义
-//    char wHeadCheckSum[2];    //IP首部校验和[Big endian]
-//    char dwIPSrc[4];         //源地址
-//    char dwIPDes[4];         //目的地址
-//    char Options;          //选项
-//} IP_HEAD;
 struct IP_HEAD
 {
     char ver_hlen;     //版本信息(前4位)，头长度(后4位)
     char byTOS;       // 服务类型8位
-    short wPacketLen;    //数据包长度
-    short wSequence;     //数据包标识
+    unsigned short wPacketLen;    //数据包长度
+    unsigned short wSequence;     //数据包标识
     short m_sSliceinfo;    //分片使用
     char byTTL;        //存活时间
     char byProtocolType;    //协议类型
@@ -95,7 +88,6 @@ struct IP_HEAD
     unsigned int dwIPSrc;    //源ip
     unsigned int dwIPDes;    //目的ip
 };
-
 
 struct TCP_HEAD
 {
@@ -108,3 +100,27 @@ struct TCP_HEAD
     short m_sCheckSum;         // 检验和16bit
     short m_surgentPointer;      // 紧急数据偏移量16bit
 };
+
+int interface_up(char *interface_name);
+int set_ipaddr(char *interface_name, char *ip);
+int tun_create(char *dev, int flags);
+int route_add(char * interface_name);
+
+void *keepalive(void* args);
+void *read_tun(void* args);
+void send_ip_responce(int sockfd,int addr);
+void send_104_package(int sockfd);
+int handle_100(int sockfd);
+int handle_104(int sockfd);
+void handle_102(int fd,Msg msg);
+
+const char dns_addr[] = "202.38.120.242 8.8.8.8 202.106.0.20";
+const char ip_base[] = "13.8.0.";
+
+extern struct IPADDR ipaddr[ADDR_SIZE];//全局变量的地址池
+extern int tun_fd;
+extern fd_set readfds, testfds;//select集合
+extern int ret;
+extern char tun_name[IFNAMSIZ];
+extern unsigned char buf[4096];
+extern User_Manager manager;
