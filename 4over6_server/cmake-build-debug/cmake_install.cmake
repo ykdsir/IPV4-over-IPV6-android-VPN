@@ -1,4 +1,4 @@
-# Install script for directory: /home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server
+# Install script for directory: /home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

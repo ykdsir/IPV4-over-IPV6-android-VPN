@@ -13,16 +13,26 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
-#include<sys/ioctl.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <iostream>
+#include <linux/if.h>
+#include <linux/if_tun.h>
+#include <net/route.h>
+#include <string.h>
 
-
+#define DATA_SIZE 4096
+#define MAXBUFF 66000
 struct Msg
 {
 	int length;		//长度
 	char type;		//类型
 	char data[4096];	//数据段
+    Msg(){
+        length = 0;
+        type = 0;
+        memset(data,0,sizeof(data));
+    }
 };
 struct User_Info_Table 		//客户信息表
 {
@@ -59,6 +69,7 @@ public:
 	void add_user(User_Info_Table user);
 	void del_user(int sockfd);
 	User_Info_Table *find_user(int sockfd);
+	User_Info_Table *find_user(in_addr v4addr);
 };
 
 //IP首部
@@ -108,3 +119,8 @@ struct TCP_HEAD
     short m_sCheckSum;         // 检验和16bit
     short m_surgentPointer;      // 紧急数据偏移量16bit
 };
+
+int interface_up(char *interface_name);
+int set_ipaddr(char *interface_name, char *ip);
+int tun_create(char *dev, int flags);
+int route_add(char * interface_name);

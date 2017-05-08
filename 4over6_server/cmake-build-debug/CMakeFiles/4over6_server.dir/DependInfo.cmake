@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/main.cpp" "/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/4over6_server.dir/main.cpp.o"
+  "/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/main.cpp" "/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/4over6_server.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
