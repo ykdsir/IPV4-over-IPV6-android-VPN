@@ -22,7 +22,7 @@
 #define HEARTBEAT 104
 
 #define MAXBUFF 1024*128
-#define DATA_SIZE 40960
+#define DATA_SIZE 4096
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"background",__VA_ARGS__)
 
 std::string IP_TUNNEL = "/data/data/com.test.a4over6_vpn/ip_pipe";
@@ -109,7 +109,7 @@ void* readVirtualInterfaceThr(void* args){
 //            setMsg(&sendPkg,IT_REQUEST,strlen(readFromVI),readFromVI);
             setMsg(&sendPkg,IT_REQUEST,length,readFromVI);
 //            LOGD("length: %d\n",sendPkg.length);
-            if((send(sockfd,&sendPkg, sizeof(Msg),0))<0){
+            if((send(sockfd,&sendPkg, sendPkg.length,0))<0){
                 LOGD("send 102 %s\n",strerror(errno));
                 continue;
             };
@@ -134,7 +134,7 @@ void* heartbeatPackThr(void* args){
     while (1){
         if (!socketLive){
             LOGD("heart beat package socketlive failed!\n");
-            return NULL;
+            break;
         }
         sleep(1);
         curTime = time(NULL);//当前时间
@@ -169,7 +169,65 @@ void* heartbeatPackThr(void* args){
         }
     }
 
-    return NULL;
+    return 0;
+}
+
+
+void handleMsg(Msg reciveMsg){
+    char toWrite[MAXBUFF];
+    memset(toWrite,0,MAXBUFF);
+    switch (reciveMsg.type){
+        case IP_RESPONCE:
+            LOGD("ip responce\n");
+            pthread_t virIntThread;
+            char ip[20],router[20],dns1[20],dns2[20],dns3[20];
+            sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
+            sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
+            LOGD("recieve: %s\n",reciveMsg.data);
+            writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
+            IPTunnelChanged = true;
+            //Done 读取前台传递的虚接口，封装102类型报文
+            memset(toWrite,0,MAXBUFF);
+            LOGD("before read: %s\n",toWrite);
+            while (!getFD){
+                sleep(1);
+            }
+            readTun(IP_TUNNEL,toWrite,MAXBUFF);
+            LOGD("after read: %s\n",toWrite);
+            sscanf(toWrite,"%d",&virIntFileDescriptor);
+            LOGD("virIntFileDescriptor: %d\n",virIntFileDescriptor);
+            memset(toWrite,0,MAXBUFF* sizeof(char));
+            writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
+            pthread_create(&virIntThread,NULL,readVirtualInterfaceThr,NULL);
+            break;
+
+        case IT_RESPONCE:
+            LOGD("IT_RESPONCE");
+//                sscanf(recvBuff,"%s",toWrite);
+//            LOGD("recv length:%d\n",reciveMsg.length);
+//            LOGD("part data:%s\n",reciveMsg.data);
+//            LOGD("%d\n",virIntFileDescriptor);
+            memcpy(toWrite,reciveMsg.data,reciveMsg.length);
+            if(virIntFileDescriptor < 0)
+                return;
+//                __android_log_assert(virIntThread == -1,"ykd",NULL);
+            if(write(virIntFileDescriptor,&toWrite[0], ((size_t)reciveMsg.length)) < 0){
+                LOGD("write virtunnel wrong %s\n",strerror(errno));
+            }
+            break;
+
+        case HEARTBEAT:
+            LOGD("heartbeat");
+            curHeartbeatTime = time(NULL);
+            if (curHeartbeatTime - preHeartbeatTime > 60){
+                socketLive = false;
+            }
+            preHeartbeatTime = curHeartbeatTime;
+            break;
+        default:
+            break;
+    }
+    return;
 }
 
 void* dataPackThr(void* args){
@@ -178,108 +236,154 @@ void* dataPackThr(void* args){
     Msg ipRequest,reciveMsg;
     long length;
     long readLength;
-    pthread_t virIntThread;
+
     char recvBuff[MAXBUFF];
-    char toWrite[DATA_SIZE];
+
 
     //发送IP请求
     setMsg(&ipRequest,IP_REQUEST,0,NULL);
     if((length = send(sockfd,&ipRequest, sizeof(Msg),0))<0){
         LOGD("%s\n", strerror(errno));
     }
-
+    int res = 0;//剩余的包的长度
+    int resLength = 0;//结束时未收完的下一个包的长度
+    char pre[DATA_SIZE];
+    memset(pre,0,DATA_SIZE* sizeof(char));
     while (1){
-        if(!socketLive)
+        if(!socketLive) {
             break;
+        }
         //接收服务器回复
         memset(recvBuff,0,MAXBUFF* sizeof(char));
         memset(&reciveMsg,0, sizeof(Msg));
-        memset(toWrite,0,DATA_SIZE);
 //        LOGD("before recv");
-        length = recv(sockfd,recvBuff, sizeof(recvBuff),0);
+        length = recv(sockfd,recvBuff, sizeof(Msg),0);
+//        LOGD("first recv %d",length);
         if(length<0)
             if ((errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN))
                 continue;
             else
                 return NULL;
-        LOGD("after recv %ld",length);
-//        for(int i=0;i<length;++i){
-//            LOGD("%02x ",recvBuff[i]);
-//        }
-//        continue;
-        if(((Msg*)(recvBuff))->length!=0)
-            readLength = ((Msg*)(recvBuff))->length;
-        memcpy(&reciveMsg,recvBuff, readLength);
+//        reciveMsg.length = *(int*)recvBuff;
+//        reciveMsg.type = *(char*)(recvBuff+4);
 //        LOGD("type:%02x",(reciveMsg.type));
 //        LOGD("length:%d",reciveMsg.length);
-        LOGD("read length:%d",readLength);
+//        while(length <reciveMsg.length){
+//            length += recv(sockfd,recvBuff+5+length,reciveMsg.length-5-length,0);
+//        }
+        LOGD("after recv %ld",length);
+        if(res == 0){
+            readLength = ((Msg*)(recvBuff))->length;
+            LOGD("read length:%ld",readLength);
+            if(readLength == length){
+                memset(&reciveMsg,0, sizeof(Msg));
+                memcpy(&reciveMsg,recvBuff, length);
+                handleMsg(reciveMsg);
+                LOGD("finish handle msg");
+            }
+            else if(readLength < length){
+                memset(&reciveMsg,0, sizeof(Msg));
+                memcpy(&reciveMsg,recvBuff,readLength);
+                handleMsg(reciveMsg);
+                LOGD("finish handle msg");
+                while(1){
+                    if(readLength - 4>length)
+                        break;
+                    LOGD("left length:%d",((Msg*)(recvBuff+readLength))->length);
+                    resLength = ((Msg*)(recvBuff+readLength))->length;
+                    readLength += resLength;
+                    if(readLength>length)
+                        break;
+                    memset(&reciveMsg,0, sizeof(Msg));
+                    memcpy(&reciveMsg,recvBuff+readLength,((Msg*)(recvBuff+readLength))->length);
+                    handleMsg(reciveMsg);
+                    LOGD("finish handle msg.");
+                    if(readLength == length) {
+                        break;
+                    }
+                }
+                if(readLength>length) {
+                    res = length - (readLength - resLength);
+                    memcpy(pre,recvBuff+length-res,res);
+                }
+                else{
+                    res = 0;
+                    resLength = 0;
+                }
+                LOGD("rest length:%d",res);
+                LOGD("next length:%d",resLength);
+            } else{
+                res = length;
+                resLength = readLength;
+                memcpy(pre,recvBuff,res);
+                continue;
+            }
+        } else if(res > 0){
+            LOGD("rest length:%d",res);
+            if(res<4){
+                char len[4];
+                memcpy(len,pre,res);
+                memcpy(len+res,recvBuff,4-res);
+                resLength = *((int*)len);
+            }
+            LOGD("next one length:%d",resLength);
+            if(length < (resLength - res)){
+                memcpy(pre+res,recvBuff,length);
+                res += length;
+                continue;
+            }
+            memcpy(&reciveMsg,pre,res);
+            memcpy(((char*)&reciveMsg)+res,recvBuff,resLength-res);
+            readLength = (resLength - res);
+            handleMsg(reciveMsg);
+            LOGD("read Length:%d",readLength);
+            LOGD("handle Msg");
+            if(length == (resLength - res)){
+                res = 0;
+                resLength = 0;
+                continue;
+            }
+            while(1){
+                resLength = ((Msg*)(recvBuff+readLength))->length;
+                readLength += resLength;
+                if(readLength>length)
+                    break;
+                memset(&reciveMsg,0, sizeof(Msg));
+                memcpy(&reciveMsg,recvBuff+readLength,((Msg*)(recvBuff+readLength))->length);
+                handleMsg(reciveMsg);
+                if(readLength == length) {
+                    break;
+                }
+            }
+            if(readLength>length) {
+                res = length - (readLength - resLength);
+                memcpy(pre,recvBuff+length-res,res);
+            }
+            else{
+                res = 0;
+                resLength = 0;
+            }
+        }
+//        if(((Msg*)(recvBuff))->length==length){
+//            res = 0;
+//        }else if(((Msg*)(recvBuff))->length<length){
+//            res = length - ((Msg*)(recvBuff))->length;
+//            memcpy(recvBuff,)
+//        }
 //        LOGD("message:%s",reciveMsg.data);
 //        LOGD("type:%02x",((Msg*)(recvBuff))->type);
 //        LOGD("length:%d",((Msg*)(recvBuff))->length);
 //        LOGD("message:%s",((Msg*)(recvBuff))->data);
 //        LOGD("raw message:%s",recvBuff);
-        switch (reciveMsg.type){
-            case IP_RESPONCE:
-                LOGD("ip responce\n");
-                char ip[20],router[20],dns1[20],dns2[20],dns3[20];
-                sscanf(reciveMsg.data,"%s %s %s %s %s",ip,router,dns1,dns2,dns3);
-                sprintf(toWrite, "%s %s %s %s %s %d", ip, router, dns1, dns2, dns3, sockfd);
-                LOGD("recieve: %s\n",reciveMsg.data);
-                writeTun(IP_TUNNEL,toWrite,strlen(toWrite));
-                IPTunnelChanged = true;
-                //Done 读取前台传递的虚接口，封装102类型报文
-                memset(recvBuff,0,MAXBUFF* sizeof(char));//此时recvBuff暂时用来保存读取虚接口的文件描述符
-//                LOGD("before read: %s\n",recvBuff);
-                while (!getFD){
-                    sleep(1);
-                }
-                readTun(IP_TUNNEL,recvBuff,MAXBUFF);
-                LOGD("after read: %s\n",recvBuff);
-                sscanf(recvBuff,"%d",&virIntFileDescriptor);
-                LOGD("virIntFileDescriptor: %d\n",virIntFileDescriptor);
-                memset(recvBuff,0,MAXBUFF* sizeof(char));
-                writeTun(IP_TUNNEL,recvBuff,strlen(recvBuff));
-                pthread_create(&virIntThread,NULL,readVirtualInterfaceThr,NULL);
-                break;
-
-            case IT_RESPONCE:
-                LOGD("IT_RESPONCE");
-//                sscanf(recvBuff,"%s",toWrite);
-                LOGD("recv length:%d\n",reciveMsg.length);
-                LOGD("part data:%s\n",reciveMsg.data);
-                LOGD("%d\n",virIntFileDescriptor);
-                memcpy(toWrite,reciveMsg.data,reciveMsg.length);
-//                __android_log_assert(virIntThread == -1,"ykd",NULL);
-                if(write(virIntFileDescriptor,&toWrite[0], ((size_t)reciveMsg.length)) < 0){
-                    LOGD("write virtunnel wrong %s\n",strerror(errno));
-                    return strerror(errno);
-                } else{
-                    ++recvCount;
-                    recvLength += length;
-                    recvTotalLength += length;
-                }
-                break;
-
-            case HEARTBEAT:
-                LOGD("heartbeat");
-                curHeartbeatTime = time(NULL);
-                if (curHeartbeatTime - preHeartbeatTime > 60){
-                    socketLive = false;
-                }
-                preHeartbeatTime = curHeartbeatTime;
-                break;
-            default:
-                break;
-        }
+        ++recvCount;
+        recvLength += length;
+        recvTotalLength += length;
     }
-    return NULL;
+    return 0;
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_test_a4over6_1vpn_MainActivity_disConnect(JNIEnv *env, jobject instance) {
 
-    // TODO Disconnect
+void disConnect(){
     IPTunnelChanged = false;
     getFD = false;
     preHeartbeatTime = -1;//上一次心跳时间
@@ -297,6 +401,14 @@ Java_com_test_a4over6_1vpn_MainActivity_disConnect(JNIEnv *env, jobject instance
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_test_a4over6_1vpn_MainActivity_disConnect(JNIEnv *env, jobject instance) {
+
+    // TODO Disconnect
+    disConnect();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_test_a4over6_1vpn_MyVPNService_setFD(JNIEnv *env, jobject instance) {
     getFD = true;
     return ;
@@ -310,20 +422,21 @@ Java_com_test_a4over6_1vpn_MainActivity_IsIPTunnelChanged(JNIEnv *env, jobject i
         tRet = JNI_TRUE;
     return tRet;
 }
+
 extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject instance) {
     // Done 创建ipv6套接字，连接隧道服务器
     //设置一个socket地址结构client_addr,代表客户机internet地址, 端口
     std::string returnValue = "ok\n";
-    socketLive = true;
+
     struct sockaddr_in6 server;
     bzero(&server, sizeof(server)); //把一段内存区的内容全部设置为0
     server.sin6_family = AF_INET6; //internet协议族
     server.sin6_port = htons(45000); //0表示让系统自动分配一个空闲端口
 //    server.sin6_port = htons(9734); //0表示让系统自动分配一个空闲端口
 
-    if (inet_pton(AF_INET6, "2402:f000:5:8601:3a9c:e094:615a:f970", &server.sin6_addr) < 0)
+    if (inet_pton(AF_INET6, "2402:f000:5:8601:dd2d:beba:dbd3:7127", &server.sin6_addr) < 0)
 //    if (inet_pton(AF_INET6, "2402:f000:1:4417::900", &server.sin6_addr) < 0)
     {
         returnValue = ("Net address error\n");
@@ -334,10 +447,12 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
     //连接服务器
     int temp = connect(sockfd, (struct sockaddr *) &server, sizeof(server));
     if(temp < 0) {
+        disConnect();
         LOGD("%s",strerror(errno));
         returnValue += ("connet to server error\n");
         return env->NewStringUTF(returnValue.c_str());
     }
+    socketLive = true;
     LOGD("after connect \n");
     //管道是否创建
     if (access(IP_TUNNEL.c_str(), F_OK) == -1)

@@ -57,70 +57,63 @@ public class MyVPNService extends VpnService{
                 Log.d("wjf", "DNS3 is " + dns3);
             }
 
-
             sockfd = intent.getStringExtra("sockfd");
 
             Log.d("wjf", sockfd);
-
+            builder.setMtu(1460);
+            try{
+                builder.addAddress(ipv4Addr,32);
+            }
+            catch (IllegalArgumentException e)
+            {
+                e.printStackTrace();
+            }
+            builder.addRoute("0.0.0.0", 0); // router is "0.0.0.0" by default
+            builder.addDnsServer(dns1);
+            builder.addDnsServer(dns2);
+            builder.addDnsServer(dns3);
+            builder.setSession("killourselves");//有俩没用到，sockfd??????
+            if (protect(Integer.parseInt(sockfd))) {
+                Log.d("wjf", "SockFD protected "+ sockfd);
+            } else {
+                Log.e("wjf", "SockFd not protected " + sockfd);
+            }
+            ParcelFileDescriptor m_interface = builder.establish();
+            if(m_interface == null)
+            {
+                Log.e("wjf","m_interface is null");
+            }
+            Log.d("wjf","before write fd");
+            int fd = m_interface.getFd();
+            Log.d("fd","fd "+fd);
+            writeFD(fd);
         } catch (NullPointerException e) {
             e.printStackTrace();
-            Log.e("wjf", "Null pointer exception in Builder");
         }
-        builder.setMtu(1460);
-        try{
-            builder.addAddress(ipv4Addr,32);
-        }
-        catch (IllegalArgumentException e)
-        {
-            e.printStackTrace();
-        }
-        builder.addRoute("0.0.0.0", 0); // router is "0.0.0.0" by default
-
-        builder.addDnsServer(dns1);
-        builder.addDnsServer(dns2);
-        builder.addDnsServer(dns3);
-        builder.setSession("killourselves");//有俩没用到，sockfd??????
-        if (protect(Integer.parseInt(sockfd))) {
-            Log.d("wjf", "SockFD protected "+ sockfd);
-        } else {
-            Log.e("wjf", "SockFd not protected " + sockfd);
-        }
-        ParcelFileDescriptor m_interface = builder.establish();
-        if(m_interface == null)
-        {
-            Log.e("wjf","m_interface is null");
-        }
-        int fd = m_interface.getFd();
-        writeFD(fd);
-        return super.onStartCommand(intent,flags,startId);
+        Log.e("wjf", "Null pointer exception in Builder");
+        return START_STICKY;
     }
     private void writeFD(int fd)
     {
-        Log.d("fd","fd "+fd);
+        Log.d("wjf","fd "+fd);
         String extDir = getApplicationInfo().dataDir;
         Log.d("wjf","extdir"+extDir.toString());
         File ipTunnel = new File(extDir,"ip_pipe");
         try{
+            Log.d("wjf", "ipTunnel: "+ipTunnel.toString());
             FileOutputStream fileOutputStream = new FileOutputStream(ipTunnel);
             Log.d("wjf", "ipTunnel: "+ipTunnel.toString());
             BufferedOutputStream out = new BufferedOutputStream(fileOutputStream);
+            Log.d("wjf", "ipTunnel: "+ipTunnel.toString());
             String fdstr = String.valueOf(fd);
             Log.d("wjf", "fdstr: "+fdstr);
-            try{
-                out.write(fdstr.getBytes());
-                out.flush();
-                out.close();
-                Log.d("wjf","have written down");
-                setFD();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-
+            out.write(fdstr.getBytes());
+            out.flush();
+            out.close();
+            Log.d("wjf","have written down");
+            setFD();
         }
-        catch (FileNotFoundException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
 
