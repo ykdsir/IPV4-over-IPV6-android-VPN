@@ -42,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private static String dns2;
     private static String dns3;
     private static String sockfd;
+    //TODO /* 界面修改，
+      /* 上传、下载速度
+             * 上传总流量和包数
+             * 下载总流量和包数
+             */
     private static String uploadSpeed;
     private static String downloadSpeed;
     private static String uploadTotalPkg;
@@ -54,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MSG_UPDATEUI = 0;
     private static final int MSG_CONNECT  = 1;
     private static final int MSG_STATUS   = 2;
+    private static final int MSG_DISCONNECT   = 3;
 
     File infoTunnel;
     FileInputStream infoInputStream;
@@ -64,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private Handler mHandler = new Handler() {
         public void handleMessage (Message msg) { // in main(UI) thread
-            EditText editText = (EditText) findViewById(R.id.editText);
+            TextView editText = (TextView) findViewById(R.id.editText);
             TextView uploadspeed = (TextView)findViewById(R.id.UploadSpeed);
             TextView downloadspeed = (TextView)findViewById(R.id.DownloadSpeed);
             TextView uploadLength = (TextView)findViewById(R.id.UploadTotalLength);
@@ -86,21 +92,21 @@ public class MainActivity extends AppCompatActivity {
                         downloadTotalLength = info[4];
                         downloadTotalPkg = info[5];
                     }
-                    //TODO 根据获得的上传、下载速度信息更新UI 更好看的界面
-                    // https://github.com/lecho/hellocharts-android
+                    //TODO 根据获得的上传、下载速度信息更新UI 更好看的界面  https://github.com/lecho/hellocharts-android
                     uploadspeed.setText(uploadSpeed);
                     downloadspeed.setText(downloadSpeed);
                     uploadLength.setText(uploadTotalLength);
                     downloadLength.setText(downloadTotalLength);
-                    uploadPkg.setText(downloadTotalLength);
+                    uploadPkg.setText(uploadTotalPkg);
                     downloadPkg.setText(downloadTotalPkg);
                     break;
                 case MSG_STATUS:
                     String status = (String)msg.obj;
                     Log.d("wjf", status);
-                    editText.append(status + "\n");
+                    editText.setText(status + "\n");
                     break;
                 case MSG_CONNECT:
+                    editText.setText("");
                     String temp = (String)msg.obj;
                     Log.d("wjf", "MSG_CONNECT " + temp);
                     info = temp.split(" ");
@@ -128,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Log.e("wjf", "Wrong info from server.");
                     }
+                    break;
+                case MSG_DISCONNECT:
+                    editText.setText((String)msg.obj);
                     break;
                 default:
                     break;
@@ -169,23 +178,18 @@ public class MainActivity extends AppCompatActivity {
                         createInfoPipe();
                         try {
                             byte[] buffer = new byte[1024];
-                /*String ostr = new String("hahaha");
-                buffer = ostr.getBytes();
-                FileOutputStream fileOutputStream = new FileOutputStream(ipTunnel);
-                BufferedOutputStream out = new BufferedOutputStream(fileOutputStream);
-                try{
-                    out.write(buffer);
-                }catch (IOException e){
-                    e.printStackTrace();
-                }*/
                             FileInputStream fileInputStream = new FileInputStream(ipTunnel);
                             BufferedInputStream in = new BufferedInputStream(fileInputStream);
                             Log.d("wjf", "Buffered input stream opened");
                             int len = 0;
                             try{
-                                while(!IsIPTunnelChanged()&&IPflag)
-                                {
+                                Log.d("wjf","before read ip tunnel");
+                                while(!IsIPTunnelChanged()) {
+
+                                }
+                                while(IPflag){
                                     len = in.read(buffer);
+                                    Log.d("wjf","read ip tunnel");
                                     if(len > 0)
                                     {
                                         Message message = new Message();
@@ -223,6 +227,17 @@ public class MainActivity extends AppCompatActivity {
 //        out.write(arr, 0, arr.length)
 //        out.flush();
 //        out.close();
+        final Button disConnectButton = (Button)findViewById(R.id.DisConnectButton);
+        disConnectButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                IPflag = true;
+                Message message = new Message();
+                message.what = MSG_DISCONNECT;
+                message.obj = "disconnect";
+                mHandler.sendMessage(message);
+                disConnect();
+            }
+        });
     }
 
     private boolean isNetConnected() {
@@ -410,18 +425,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        try{
-            infoInputStream = new FileInputStream(infoTunnel);
-            infoBufferStream = new BufferedInputStream(infoInputStream);
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-        }
+//        try{
+//            infoInputStream = new FileInputStream(infoTunnel);
+//            infoBufferStream = new BufferedInputStream(infoInputStream);
+//        }catch (FileNotFoundException e){
+//            e.printStackTrace();
+//        }
     }
 
     private String readInfoPipe(){
         byte[] buffer = new byte[1024];
         int len ;
         try {
+            infoInputStream = new FileInputStream(infoTunnel);
+            infoBufferStream = new BufferedInputStream(infoInputStream);
             len = infoBufferStream.read(buffer);
             if (len > 0) {
                 Message message = new Message();
@@ -436,6 +453,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 mHandler.sendMessage(message);
             }
+            infoInputStream.close();
+            infoBufferStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -449,4 +468,5 @@ public class MainActivity extends AppCompatActivity {
     public native String startBackground();
     public native String test();
     public native boolean IsIPTunnelChanged();
+    public native void disConnect();
 }
