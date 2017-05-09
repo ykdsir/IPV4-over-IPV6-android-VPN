@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.test.a4over6_vpn.MainActivity">
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -24,6 +25,7 @@
             android:isScrollContainer="true"
             android:layout_weight="1"/>
     </LinearLayout>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -87,111 +89,218 @@
             android:layout_weight="1"
             />
     </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:text="Upload Speed: "
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/UploadSpeed"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="UploadSpeed"
-            android:layout_weight="1"/>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:text="download speed: "
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/DownloadSpeed"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="DownloadSpeed"
-            android:layout_weight="1"/>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:text="Upload Total Bytes: "
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/UploadTotalLength"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Upload Total pkg"
-            android:layout_weight="1"/>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <Button
-            android:text="Upload Total Pkg: "
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/UploadPkg"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Upload Total pkg"
-            android:layout_weight="1"/>
-    </LinearLayout>
+    <!--<LinearLayout-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<Button-->
+            <!--android:text="Upload Speed: "-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"/>-->
+        <!--<TextView-->
+            <!--android:id="@+id/UploadSpeed"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="UploadSpeed"-->
+            <!--android:layout_weight="1"/>-->
+    <!--</LinearLayout>-->
+    <!--<LinearLayout-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<Button-->
+            <!--android:text="download speed: "-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"/>-->
+        <!--<TextView-->
+            <!--android:id="@+id/DownloadSpeed"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="DownloadSpeed"-->
+            <!--android:layout_weight="1"/>-->
+    <!--</LinearLayout>-->
+    <!--<LinearLayout-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<Button-->
+            <!--android:text="Upload Total Bytes: "-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"/>-->
+        <!--<TextView-->
+            <!--android:id="@+id/UploadTotalLength"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="Upload Total pkg"-->
+            <!--android:layout_weight="1"/>-->
+    <!--</LinearLayout>-->
+    <!--<LinearLayout-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<Button-->
+            <!--android:text="Upload Total Pkg: "-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"/>-->
+        <!--<TextView-->
+            <!--android:id="@+id/UploadPkg"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="Upload Total pkg"-->
+            <!--android:layout_weight="1"/>-->
+    <!--</LinearLayout>-->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Download Total Bytes: " />
+        <!--<Button-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="Download Total Bytes: " />-->
 
-        <TextView
-            android:id="@+id/DownloadTotalLength"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:hint="Upload Total pkg" />
-    </LinearLayout>
+        <!--<TextView-->
+            <!--android:id="@+id/DownloadTotalLength"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_weight="1"-->
+            <!--android:hint="Upload Total pkg" />-->
+    <!--</LinearLayout>-->
 
-    <LinearLayout
-        android:orientation="horizontal"
+
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content">-->
+                <!--<Button-->
+                    <!--android:text="Download Total pkg: "-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"/>-->
+                <!--<TextView-->
+                    <!--android:id="@+id/DownloadPkg"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:hint="Download Total pkg"-->
+                    <!--android:layout_weight="1"/>-->
+                <!--<lecho.lib.hellocharts.view.ColumnChartView-->
+                    <!--android:id="@+id/chart"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent" >-->
+                <!--</lecho.lib.hellocharts.view.ColumnChartView>-->
+            <!--</LinearLayout>-->
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <Button
-            android:text="Download Total pkg: "
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/DownloadPkg"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Download Total pkg"
-            android:layout_weight="1"/>
-    </LinearLayout>
+            android:orientation="vertical">
+
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    tools:context="lecho.lib.hellocharts.samples.LineChartActivity$PlaceholderFragment" >
+
+                    <lecho.lib.hellocharts.view.LineChartView
+                        android:id="@+id/uploadSpeedchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+                    </lecho.lib.hellocharts.view.LineChartView>
+
+                </RelativeLayout>
+
+
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    tools:context="lecho.lib.hellocharts.samples.LineChartActivity$PlaceholderFragment" >
+
+                    <lecho.lib.hellocharts.view.LineChartView
+                        android:id="@+id/downloadspeedchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+                    </lecho.lib.hellocharts.view.LineChartView>
+
+                </RelativeLayout>
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    tools:context="lecho.lib.hellocharts.samples.LineChartActivity$PlaceholderFragment" >
+
+                    <lecho.lib.hellocharts.view.LineChartView
+                        android:id="@+id/uploadTotalLengthchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+                    </lecho.lib.hellocharts.view.LineChartView>
+
+                </RelativeLayout>
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    tools:context="lecho.lib.hellocharts.samples.LineChartActivity$PlaceholderFragment" >
+
+                    <lecho.lib.hellocharts.view.LineChartView
+                        android:id="@+id/uploadTotalPkgchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+                    </lecho.lib.hellocharts.view.LineChartView>
+
+                </RelativeLayout>
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    tools:context="lecho.lib.hellocharts.samples.LineChartActivity$PlaceholderFragment" >
+
+                    <lecho.lib.hellocharts.view.LineChartView
+                        android:id="@+id/downloadTotalLengthchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+                    </lecho.lib.hellocharts.view.LineChartView>
+
+                </RelativeLayout>
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    tools:context="lecho.lib.hellocharts.samples.LineChartActivity$PlaceholderFragment" >
+
+                    <lecho.lib.hellocharts.view.LineChartView
+                        android:id="@+id/downloadTotalPkgchart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+                    </lecho.lib.hellocharts.view.LineChartView>
+
+                </RelativeLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+
+
+
+
+
 
 </LinearLayout >
