@@ -1,1 +1,0 @@
-/usr/bin/c++   -g   CMakeFiles/4over6_server.dir/main.cpp.o  -o 4over6_server 

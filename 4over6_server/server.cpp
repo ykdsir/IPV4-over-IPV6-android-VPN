@@ -29,6 +29,7 @@ int handle_100(int sockfd);
 int handle_104(int sockfd);
 void handle_102(int fd,Msg msg);
 int recv_Msg(int fd, Msg *msg);
+void handleMsg(int fd,Msg* msg);
 char dns_addr[] = "202.38.120.242 8.8.8.8 202.106.0.20";
 char ip_base[] = "13.8.0.";
 int main()
@@ -82,13 +83,15 @@ int main()
 
 //激活虚拟网卡增加到虚拟网卡的路由
     interface_up(tun_name);
-    route_add(tun_name);
+    //route_add(tun_name);
     char command[64];
     sprintf(command,"ifconfig %s 13.8.0.1/24",tun_name);
     system(command);
     sprintf(command,"route add -net 13.8.0.0 netmask 255.255.255.0 dev %s",tun_name);
     system(command);
     sprintf(command,"bash -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'");
+    system(command);
+    sprintf(command,"sh iptables.sh");
     system(command);
 	// tun_fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);//tun 虚接口
 	// printf("tun_fd : %d, errno : %d\n", tun_fd,errno);
@@ -184,18 +187,18 @@ int main()
                     printf("after add user\n");
 				}else{
 					ioctl(fd, FIONREAD, &nread);//获取接收缓冲区的字节数
-					if (nread>0){
+					if (nread>4){
 						Msg* msg = new Msg();
                         //printf("nread >= 4: %d\n",nread);
 						int num = 0;
                         //num = recv(fd,&msg,sizeof(msg),0);
                         num = recv_Msg(fd,msg);
-                        printf("end recive\n");
-//                        if(num<msg->length){
-//                            printf("num < length : %d < %d\n",num,msg->length);
-//                            continue;
-//                        }
-//                        handleMsg(msg);
+//                        printf("end recive\n");
+                        if(num<msg->length){
+                            printf("num < length : %d < %d\n",num,msg->length);
+                            continue;
+                        }
+                        handleMsg(fd,msg);
 					}
 				}
 			}
@@ -210,8 +213,6 @@ void handleMsg(int fd,Msg* msg){
     switch (msg->type){
         case IP_REQUEST :
             //TODO:回应101报文
-//            printf("100 message num : %d\n",num);
-//            printf("100 message length : %c\n",msg.type);
             handle_100(fd);
             break;
         case 102 :
@@ -259,7 +260,6 @@ static void *keepalive(void* args){
 				}catch (...){
 					printf("close fd failed ");
 				}
-
 			}
 		}
 	}
@@ -309,7 +309,7 @@ static void *read_tun(void* args){
                             }
                         }
 					}
-                    printf("send 103 message, length: %d\n",num);
+                    //printf("send 103 message, length: %d\n",num);
                 }
             }
        }else{
@@ -384,7 +384,7 @@ void send_104_package(int sockfd){
 }
 
 void handle_102(int fd,Msg msg){
-	printf("recv 102 Message -> data: %s\n",msg.data);
+	//printf("recv 102 Message -> data: %s\n",msg.data);
     //printf("length : %d", length);
 	char buff[32];
 	char data[4096];
@@ -423,7 +423,7 @@ void handle_102(int fd,Msg msg){
 		printf("tun_fd : %d ", tun_fd);
 		printf("send  from tun failed errno : %s\n", strerror(errno));
 	}
-	printf("send to tun  %d bytes\n",num);
+	//printf("send to tun  %d bytes\n",num);
 	return;
 }
 
@@ -458,168 +458,44 @@ void User_Manager::del_user(int sockfd){
 
 
 int recv_Msg(int fd, Msg *reciveMsg){
-//    int num = 0;
-//    try {
-//        while(num<4){
-//            num = recv(fd,msg,4,MSG_PEEK);
-//            if(num==0){
-//                printf("recv_Msg from %d error : %s,\n", fd, strerror(errno));
-//            }
-//            if(num<0){
-//                if(errno != EINTR && errno != 0){
-//                    printf("recv_Msg from %d failed errno : %s, \n" , fd,strerror(errno));
-//                    FD_CLR(fd,&readfds);
-//                    try{
-//                        close(fd);
-//                        return -1;
-//                    }catch (...){
-//                        printf("main close fd failed \n");
-//                    }
-//                }
-//            }
-//        }
-//        int length = msg->length;
-//        num = recv(fd,msg,length,MSG_WAITALL);
-//        return num;
-//    }catch (...) {
-//        printf("recv_Msg from %d error : %s", fd, strerror(errno));
-//        return -1;
-//    }
-    int length = 0;
-    int readLength = 0;
-    memset(pre,0,DATA_SIZE* sizeof(char));
-    //接收回复
-    memset(recvBuff,0,MAXBUFF* sizeof(char));
-    memset(reciveMsg,0, sizeof(Msg) );
-        printf("before recv\n");
-        length = recv(fd,recvBuff, sizeof(Msg),0);
-        printf("first recv %d\n",length);
-        printf("res%d\n",res);
-        if(length<0)
-            if ((errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN))
-                return 0;
-            else
-                return -1;
-        if(res == 0){
-            if(length<4){
-                res += length;
-                memcpy(pre,recvBuff,res);
-                return 0;
+    int num = 0;
+    try {
+        while(num<4){
+            num = recv(fd,reciveMsg,4,MSG_PEEK);
+            if(num==0){
+                printf("recv_Msg from %d error : %s,\n", fd, strerror(errno));
             }
-            readLength = ((Msg*)(recvBuff))->length;
-            printf("readlength %d\n",readLength);
-            if(readLength == length){
-                memset(reciveMsg,0, sizeof(Msg));
-                memcpy(reciveMsg,recvBuff, length);
-                handleMsg(fd,reciveMsg);
-                return 0;
-            }
-            else if(readLength < length){
-                memset(reciveMsg,0, sizeof(Msg));
-                memcpy(reciveMsg,recvBuff,readLength);
-                handleMsg(fd,reciveMsg);
-
-                while(1){
-                    if(readLength + 4 > length)
-                        break;
-                    resLength = ((Msg*)(recvBuff+readLength))->length;
-                    readLength += resLength;
-                    printf("restLength:%d\n",resLength);
-                    printf("readLength:%d\n",readLength);
-                    if(readLength>length)
-                        break;
-                    memset(reciveMsg,0, sizeof(Msg));
-                    memcpy(reciveMsg,recvBuff+readLength,resLength);
-                    handleMsg(fd,reciveMsg);
-//                    LOGD("finish handle msg.");
-                    if(readLength == length) {
-                        break;
+            if(num<0){
+                if(errno != EINTR && errno != 0){
+                    printf("recv_Msg from %d failed errno : %s, \n" , fd,strerror(errno));
+                    FD_CLR(fd,&readfds);
+                    try{
+                        close(fd);
+                        return -1;
+                    }catch (...){
+                        printf("main close fd failed \n");
                     }
                 }
-                if(readLength>length) {
-                    res = length - (readLength - resLength);
-                    memcpy(pre,recvBuff+length-res,res);
-                }
-                else if(readLength == length){
-                    res = 0;
-                    resLength = 0;
-                    memset(pre,4096,0);
-                }
-                else{
-                    res = length - readLength;
-                    resLength = 0;
-                    memcpy(pre,recvBuff+readLength,res);
-                }
-//                LOGD("rest length:%d",res);
-//                LOGD("next length:%d",resLength);
-            } else{
-                res = length;
-                resLength = readLength;
-                memcpy(pre,recvBuff,res);
-//                continue;
-                return 0;
-            }
-        } else if(res > 0) {
-            if (res < 4) {
-                if(length < (4-res)){
-                    res += length;
-                    memcpy(pre+res,recvBuff,length);
-                    return 0;
-                }
-                char len[4];
-                memcpy(len, pre, res);
-                memcpy(len + res, recvBuff, 4 - res);
-                resLength = ((Msg*)(len))->length;
-            }
-            printf("next one length:%d\n",resLength);
-            if (length < (resLength - res)) {
-                memcpy(pre + res, recvBuff, length);
-                res += length;
-//                continue;
-                return 0;
-            }
-            memcpy(reciveMsg, pre, res);
-            memcpy(((char *) reciveMsg) + res, recvBuff, resLength - res);
-            readLength = (resLength - res);
-            handleMsg(fd,reciveMsg);
-            printf("read Length:%d",readLength);
-//            LOGD("handle Msg");
-            if (length == readLength) {
-                res = 0;
-                resLength = 0;
-//                continue;
-                return 0;
-            }
-            while (1) {
-                if(readLength + 4>length)
-                    break;
-                resLength = ((Msg *) (recvBuff + readLength))->length;
-                printf("next one length：%d\n",resLength);
-                readLength += resLength;
-                if (readLength > length)
-                    break;
-                memset(reciveMsg, 0, sizeof(Msg));
-                memcpy(reciveMsg, recvBuff + readLength, resLength);
-                handleMsg(fd,reciveMsg);
-                if (readLength == length) {
-                    break;
-                }
-            }
-            if (readLength > length) {
-                res = length - (readLength - resLength);
-                memcpy(pre, recvBuff + length - res, res);
-            } else if(readLength == length){
-                res = 0;
-                resLength = 0;
-                memset(pre,4096,0);
-            }
-            else{
-                res = length - readLength;
-                resLength = 0;
-                memcpy(pre,recvBuff+readLength,res);
             }
         }
-    return 0;
+        int length = reciveMsg->length;
+        num = 0;
+        while(num < length){
+            int temp = recv(fd,reciveMsg+num,length-num,MSG_WAITALL);
+            if(temp > 0){
+                num += temp;
+            }else{
+                printf("temp < 0: num:%d / length:%d error : %s\n", num,length, strerror(errno));
+                break;
+            }
+            //num += recv(fd,reciveMsg+num,length-num,MSG_WAITALL);
+        }
+        //num = recv(fd,msg,length,MSG_WAITALL);
+        return num;
+    }catch (...) {
+        printf("recv_Msg from %d error : %s", fd, strerror(errno));
+        return -1;
+    }
 }
 
 User_Info_Table *User_Manager::find_user(int sockfd){
@@ -655,7 +531,7 @@ User_Info_Table *User_Manager::find_user(in_addr v4addr){
         }
     }
     char buff[32];
-    printf("*User_Manager::find_user %s failed\n",inet_ntop(AF_INET,&v4addr,buff,sizeof(buff)));
+    //printf("*User_Manager::find_user %s failed\n",inet_ntop(AF_INET,&v4addr,buff,sizeof(buff)));
     return NULL;
 }
 

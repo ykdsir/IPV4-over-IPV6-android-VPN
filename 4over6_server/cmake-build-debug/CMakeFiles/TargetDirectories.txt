@@ -1,3 +1,3 @@
-/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/4over6_server.dir
+/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/CMakeFiles/yanjy.dir

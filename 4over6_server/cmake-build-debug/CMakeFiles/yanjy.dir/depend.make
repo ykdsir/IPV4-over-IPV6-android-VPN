@@ -1,2 +1,2 @@
-# Empty dependencies file for 4over6_server.
+# Empty dependencies file for yanjy.
 # This may be replaced when dependencies are built.

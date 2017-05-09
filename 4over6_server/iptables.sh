@@ -8,7 +8,7 @@ iptables -t nat -D POSTROUTING 1
 #iptables -L FORWARD
 #iptables -D FORWARD 1
 
-iptables -t nat -A POSTROUTING -s 13.8.0.2 -j SNAT --to-source 59.66.134.77
+iptables -t nat -A POSTROUTING -s 13.8.0.0/24 -j SNAT --to-source 59.66.134.77
 iptables -t nat -vnL POSTROUTING --line-number
 
 
