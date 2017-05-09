@@ -114,5 +114,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/4over6_server.dir/DependInfo.cmake"
+  "CMakeFiles/yanjy.dir/DependInfo.cmake"
   )

@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MSG_UPDATEUI = 0;
     private static final int MSG_CONNECT  = 1;
     private static final int MSG_STATUS   = 2;
+    private static final int MSG_DISCONNECT   = 3;
 
     private ColumnChartView chart;
 
@@ -291,6 +292,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("wjf", "Wrong info from server.");
                     }
                     break;
+                case MSG_DISCONNECT:
+                    editText.setText((String)msg.obj);
+                    break;
                 default:
                     break;
             }
@@ -374,15 +378,6 @@ public class MainActivity extends AppCompatActivity {
                         createInfoPipe();
                         try {
                             byte[] buffer = new byte[1024];
-                /*String ostr = new String("hahaha");
-                buffer = ostr.getBytes();
-                FileOutputStream fileOutputStream = new FileOutputStream(ipTunnel);
-                BufferedOutputStream out = new BufferedOutputStream(fileOutputStream);
-                try{
-                    out.write(buffer);
-                }catch (IOException e){
-                    e.printStackTrace();
-                }*/
                             FileInputStream fileInputStream = new FileInputStream(ipTunnel);
                             BufferedInputStream in = new BufferedInputStream(fileInputStream);
                             Log.d("wjf", "Buffered input stream opened");
@@ -437,6 +432,10 @@ public class MainActivity extends AppCompatActivity {
         disConnectButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 IPflag = true;
+                Message message = new Message();
+                message.what = MSG_DISCONNECT;
+                message.obj = "disconnect";
+                mHandler.sendMessage(message);
                 disConnect();
             }
         });

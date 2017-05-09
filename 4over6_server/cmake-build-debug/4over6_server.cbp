@@ -8,38 +8,38 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
+				<Option working_dir="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
+				<Option working_dir="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
+				<Option working_dir="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="4over6_server">
-				<Option output="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/4over6_server" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
+				<Option output="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/4over6_server" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
@@ -54,15 +54,15 @@
 					<Add directory="/usr/include/c++/5/backward"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 4over6_server"/>
-					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 4over6_server"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="4over6_server/fast">
-				<Option output="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/4over6_server" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
+				<Option output="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/4over6_server" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
@@ -77,17 +77,17 @@
 					<Add directory="/usr/include/c++/5/backward"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 4over6_server/fast"/>
-					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 4over6_server/fast"/>
+					<CompileFile command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j4 -f &quot;/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/main.cpp">
+		<Unit filename="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/main.cpp">
 			<Option target="4over6_server"/>
 		</Unit>
-		<Unit filename="/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/CMakeLists.txt">
+		<Unit filename="/home/ykd/桌面/yanjy/tun版/IPV4-over-IPV6-android-VPN/4over6_server/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>

@@ -14,12 +14,6 @@
 # EXTERNAL cache entries
 ########################
 
-//Value Computed by CMake
-4over6_server_BINARY_DIR:STATIC=/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug
-
-//Value Computed by CMake
-4over6_server_SOURCE_DIR:STATIC=/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server
-
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
 
@@ -127,7 +121,7 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=4over6_server
+CMAKE_PROJECT_NAME:STATIC=yanjy
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -183,6 +177,12 @@ ProcessorCount_cmd_getconf:FILEPATH=/usr/bin/getconf
 
 //Path to a program.
 ProcessorCount_cmd_sysctl:FILEPATH=/sbin/sysctl
+
+//Value Computed by CMake
+yanjy_BINARY_DIR:STATIC=/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server/cmake-build-debug
+
+//Value Computed by CMake
+yanjy_SOURCE_DIR:STATIC=/home/ykd/桌面/yanjy/IPV4-over-IPV6-android-VPN/4over6_server
 
 
 ########################

@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named 4over6_server
+# Target rules for targets named yanjy
 
 # Build rule for target.
-4over6_server: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 4over6_server
-.PHONY : 4over6_server
+yanjy: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 yanjy
+.PHONY : yanjy
 
 # fast build rule for target.
-4over6_server/fast:
-	$(MAKE) -f CMakeFiles/4over6_server.dir/build.make CMakeFiles/4over6_server.dir/build
-.PHONY : 4over6_server/fast
+yanjy/fast:
+	$(MAKE) -f CMakeFiles/yanjy.dir/build.make CMakeFiles/yanjy.dir/build
+.PHONY : yanjy/fast
 
 main.o: main.cpp.o
 
@@ -129,7 +129,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) -f CMakeFiles/4over6_server.dir/build.make CMakeFiles/4over6_server.dir/main.cpp.o
+	$(MAKE) -f CMakeFiles/yanjy.dir/build.make CMakeFiles/yanjy.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -138,7 +138,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) -f CMakeFiles/4over6_server.dir/build.make CMakeFiles/4over6_server.dir/main.cpp.i
+	$(MAKE) -f CMakeFiles/yanjy.dir/build.make CMakeFiles/yanjy.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -147,7 +147,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) -f CMakeFiles/4over6_server.dir/build.make CMakeFiles/4over6_server.dir/main.cpp.s
+	$(MAKE) -f CMakeFiles/yanjy.dir/build.make CMakeFiles/yanjy.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -158,7 +158,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... 4over6_server"
+	@echo "... yanjy"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
