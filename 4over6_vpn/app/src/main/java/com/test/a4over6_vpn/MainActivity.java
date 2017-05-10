@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private static float downloadTotalPkgInfo[];
     private static float uploadTotalLengthInfo[];
     private static float downloadTotalLengthInfo[];
+    private static String unit1;
+    private static String unit2;
 
 
     private boolean IPflag =  true;
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MSG_CONNECT  = 1;
     private static final int MSG_STATUS   = 2;
     private static final int MSG_DISCONNECT   = 3;
+    private static boolean ifConnect;
 
     private ColumnChartView chart;
 
@@ -102,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
             TextView editText = (TextView) findViewById(R.id.editText);
 //            TextView uploadspeed = (TextView)findViewById(R.id.UploadSpeed);
 //            TextView downloadspeed = (TextView)findViewById(R.id.DownloadSpeed);
-//            TextView uploadLength = (TextView)findViewById(R.id.UploadTotalLength);
-//            TextView downloadLength = (TextView)findViewById(R.id.DownloadTotalLength);
+            TextView uploadLength = (TextView)findViewById(R.id.UploadTotalLength);
+            TextView downloadLength = (TextView)findViewById(R.id.DownloadTotalLength);
 //            TextView uploadPkg = (TextView)findViewById(R.id.UploadPkg);
 //            TextView downloadPkg = (TextView)findViewById(R.id.DownloadPkg);
             switch (msg.what) {
@@ -114,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("wjf", update);
                     info = update.split(" ");
                     Log.d("wjf","wjf");
-                    if (info.length == 6){
-                        Log.d("wjf","split 6");
+                    if (info.length == 8){
+                        Log.d("wjf","split 8");
 
                         uploadSpeed = info[0];
                         float tempfloat[] = new float[6];
@@ -133,11 +136,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         downloadSpeedInfo[0] = Float.valueOf(info[1]);
                         uploadTotalLength = info[2];
-                        for(int i=0;i<INFOLENGTH-1;i++)
-                        {
-                            uploadTotalLengthInfo[INFOLENGTH-1-i] = uploadTotalLengthInfo[INFOLENGTH-1-i-1];
-                        }
-                        uploadTotalLengthInfo[0] = Float.valueOf(info[2]);
+
                         uploadTotalPkg = info[3];
                         for(int i=0;i<INFOLENGTH-1;i++)
                         {
@@ -145,116 +144,33 @@ public class MainActivity extends AppCompatActivity {
                         }
                         uploadTotalPkgInfo[0] = Float.valueOf(info[3]);
                         downloadTotalLength = info[4];
-                        for(int i=0;i<INFOLENGTH-1;i++)
-                        {
-                            downloadTotalLengthInfo[INFOLENGTH-1-i] = downloadTotalLengthInfo[INFOLENGTH-1-i-1];
-                        }
-                        downloadTotalLengthInfo[0] = Float.valueOf(info[4]);
+
                         downloadTotalPkg = info[5];
                         for(int i=0;i<INFOLENGTH-1;i++)
                         {
                             downloadTotalPkgInfo[INFOLENGTH-1-i] = downloadTotalPkgInfo[INFOLENGTH-1-i-1];
                         }
                         downloadTotalPkgInfo[0] = Float.valueOf(info[5]);
+                        unit1 = info[6];
+                        unit2 = info[7];
 
                     }
-                    //柱状图++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//                    int numSubcolumns = 1;
-//                    int numColumns = 6;
-//                    List<Column> columns = new ArrayList<Column>();
-//                    List<SubcolumnValue> values;
-//                    List<AxisValue> axisValues = new ArrayList<AxisValue>();
-//                    for (int i = 0; i < numColumns; ++i) {
-//
-//                        values = new ArrayList<SubcolumnValue>();
-//                        for (int j = 0; j < numSubcolumns; ++j) {
-//                            values.add(new SubcolumnValue(
-//                                    Float.valueOf(info[i]),ChartUtils
-//                                    .pickColor()));
-//                        }
-//
-//                        Column column = new Column(values);
-//                        column.setHasLabels(true);
-//
-//                        column.setHasLabelsOnlyForSelected(true);
-//                        columns.add(column);
-//                        axisValues.add(new AxisValue(i).setLabel(infoLabels[i]));
-//                    }
-//
-//                    data = new ColumnChartData(columns);
-//                    Axis axisX = new Axis(axisValues);
-//                    Axis axisY = new Axis().setHasLines(true);
-//                    if (true) {
-//                        axisX.setName("Axis Xwjf");
-//                        axisY.setName("Axis Ywjf");
-//                    }
-//                    data.setAxisXBottom(axisX);
-//                    data.setAxisYLeft(axisY);
-//
-//                    chart.setColumnChartData(data);
 
-                    //柱状图+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
                     //第一条折线+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                     drawLine(uploadSpeedInfo,(LineChartView)findViewById(R.id.uploadSpeedchart),"uploadSpeed");
                     drawLine(downloadSpeedInfo,(LineChartView)findViewById(R.id.downloadspeedchart),"downloadSpeed");
-                    drawLine(uploadTotalLengthInfo,(LineChartView)findViewById(R.id.uploadTotalLengthchart),"uploadTotalLength");
+//                    drawLine(uploadTotalLengthInfo,(LineChartView)findViewById(R.id.uploadTotalLengthchart),"uploadTotalLength");
                     drawLine(uploadTotalPkgInfo,(LineChartView)findViewById(R.id.uploadTotalPkgchart),"uploadTotalPkg");
-                    drawLine(downloadTotalLengthInfo,(LineChartView)findViewById(R.id.downloadTotalLengthchart),"downloadTotalLength");
+//                    drawLine(downloadTotalLengthInfo,(LineChartView)findViewById(R.id.downloadTotalLengthchart),"downloadTotalLength");
                     drawLine(downloadTotalPkgInfo,(LineChartView)findViewById(R.id.downloadTotalPkgchart),"downloadTotalPkg");
-//                    List<Line> lines = new ArrayList<Line>();
-//                    for (int i = 0; i < 1; ++i) {
-//
-//                        List<PointValue> values = new ArrayList<PointValue>();
-//                        for (int j = 0; j < INFOLENGTH; ++j) {
-//                            values.add(new PointValue(j,uploadSpeedInfo[j]));
-//                        }
-//
-//                        Line line = new Line(values);
-//                        line.setColor(ChartUtils.COLORS[i]);
-//                        line.setShape(ValueShape.CIRCLE);
-//                        line.setCubic(false);
-//                        line.setFilled(false);
-//                        line.setHasLabels(false);
-//                        line.setHasLabelsOnlyForSelected(false);
-//                        line.setHasLines(true);
-//                        line.setHasPoints(true);
-//                        if (true) {
-//                            line.setPointColor(ChartUtils.COLORS[(i + 1)
-//                                    % ChartUtils.COLORS.length]);
-//                        }
-//                        lines.add(line);
-//                    }
-//
-//
-//                    LineChartData data = new LineChartData(lines);
-//                    if (true) {
-//                        Axis axisX = new Axis();
-//                        Axis axisY = new Axis().setHasLines(true);
-//
-//                        if (true) {
-//                            axisX.setName("time X");
-//                            axisY.setName("uploadSpeed Y");
-//                        }
-//                        data.setAxisXBottom(axisX);
-//                        data.setAxisYLeft(axisY);
-//                    } else {
-//                        data.setAxisXBottom(null);
-//                        data.setAxisYLeft(null);
-//                    }
-//                    LineChartView uploadSpeedChart = (LineChartView)findViewById(R.id.uploadSpeedchart);
-//                    data.setBaseValue(Float.NEGATIVE_INFINITY);
-//                    uploadSpeedChart.setLineChartData(data);
 
                     //第一条折线+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
                     //TODO 根据获得的上传、下载速度信息更新UI 更好看的界面  https://github.com/lecho/hellocharts-android
-//                    uploadspeed.setText(uploadSpeed);
-//                    downloadspeed.setText(downloadSpeed);
-//                    uploadLength.setText(uploadTotalLength);
-//                    downloadLength.setText(downloadTotalLength);
-//                    uploadPkg.setText(uploadTotalPkg);
-//                    downloadPkg.setText(downloadTotalPkg);
+
+                    uploadLength.setText(uploadTotalLength+unit1+"B");
+                    downloadLength.setText(downloadTotalLength+unit2+"B");
                     Log.d("wjf","column over");
                     break;
                 case MSG_STATUS:
@@ -319,43 +235,9 @@ public class MainActivity extends AppCompatActivity {
         connectButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view)
             {
+                Log.d("wjf","kaiqi back");
                 Toast.makeText(MainActivity.this,"kai qi background",Toast.LENGTH_LONG).show();
-                //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                Runnable charrun = new Runnable() {
-                    @Override
-                    public void run() {
 
-                        int t = 1;
-                        while(t>0)
-                        {
-                            Message message = new Message();
-                            message.what = MSG_UPDATEUI;
-                            try{
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-
-                            String temp = new String(""+t+" "+t+" "+t+" "+t+" "+t+" "+t);
-                            Log.d("wjf","temp"+temp);
-                            message.obj = temp;
-
-                            mHandler.sendMessage(message);
-                            t++;
-                        }
-
-
-                    }
-                };
-
-
-                    Thread charthr = new Thread(charrun);
-                    charthr.start();
-
-
-
-
-                //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 Runnable background = new Runnable(){
                     public void run()
                     {
@@ -369,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
                 Thread backgroundthr = new Thread(background);
-               // backgroundthr.start();
+               backgroundthr.start();
                 //---------------------------------------------------------------------------------------------------------------------------------------------
                 Runnable readIpPipe = new Runnable() {
                     @Override
@@ -385,11 +267,15 @@ public class MainActivity extends AppCompatActivity {
                             try{
                                 Log.d("wjf","before read ip tunnel");
                                 while(!IsIPTunnelChanged()) {
-
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                                 while(IPflag){
                                     len = in.read(buffer);
-                                    Log.d("wjf","read ip tunnel");
+                                    Log.d("wjf","read ip tunnel"+"wjf"+len);
                                     if(len > 0)
                                     {
                                         Message message = new Message();
@@ -409,6 +295,16 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                                 in.close();
+                                ifConnect = true;
+                                while(ifConnect)
+                                {
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    readInfoPipe();
+                                }
 
                             }catch (IOException e){
                                 e.printStackTrace();
@@ -419,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
                 Thread readIpPipeth = new Thread(readIpPipe);
-               // readIpPipeth.start();
+               readIpPipeth.start();
             }
         });
         //TODO 开启前台计时器刷新界面
@@ -436,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
                 message.what = MSG_DISCONNECT;
                 message.obj = "disconnect";
                 mHandler.sendMessage(message);
+                ifConnect = false;
                 disConnect();
             }
         });
@@ -692,7 +589,7 @@ public class MainActivity extends AppCompatActivity {
                 ret = ret.substring(0, len);
                 info = ret.split(" ");
                 message.obj = ret;
-                if (info.length == 6) {
+                if (info.length == 8) {
                     message.what = MSG_UPDATEUI;
                 } else {
                     message.what = MSG_STATUS;
@@ -716,3 +613,75 @@ public class MainActivity extends AppCompatActivity {
     public native boolean IsIPTunnelChanged();
     public native void disConnect();
 }
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//                Runnable charrun = new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        int t = 1;
+//                        while(t>0)
+//                        {
+//                            Message message = new Message();
+//                            message.what = MSG_UPDATEUI;
+//                            try{
+//                                Thread.sleep(1000);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                            String temp = new String(""+t+" "+t+" "+t+" "+t+" "+t+" "+t);
+//                            Log.d("wjf","temp"+temp);
+//                            message.obj = temp;
+//
+//                            mHandler.sendMessage(message);
+//                            t++;
+//                        }
+//
+//
+//                    }
+//                };
+
+
+//                    Thread charthr = new Thread(charrun);
+//                    charthr.start();
+
+
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//柱状图++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//                    int numSubcolumns = 1;
+//                    int numColumns = 6;
+//                    List<Column> columns = new ArrayList<Column>();
+//                    List<SubcolumnValue> values;
+//                    List<AxisValue> axisValues = new ArrayList<AxisValue>();
+//                    for (int i = 0; i < numColumns; ++i) {
+//
+//                        values = new ArrayList<SubcolumnValue>();
+//                        for (int j = 0; j < numSubcolumns; ++j) {
+//                            values.add(new SubcolumnValue(
+//                                    Float.valueOf(info[i]),ChartUtils
+//                                    .pickColor()));
+//                        }
+//
+//                        Column column = new Column(values);
+//                        column.setHasLabels(true);
+//
+//                        column.setHasLabelsOnlyForSelected(true);
+//                        columns.add(column);
+//                        axisValues.add(new AxisValue(i).setLabel(infoLabels[i]));
+//                    }
+//
+//                    data = new ColumnChartData(columns);
+//                    Axis axisX = new Axis(axisValues);
+//                    Axis axisY = new Axis().setHasLines(true);
+//                    if (true) {
+//                        axisX.setName("Axis Xwjf");
+//                        axisY.setName("Axis Ywjf");
+//                    }
+//                    data.setAxisXBottom(axisX);
+//                    data.setAxisYLeft(axisY);
+//
+//                    chart.setColumnChartData(data);
+
+//柱状图+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
