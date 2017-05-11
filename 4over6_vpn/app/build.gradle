@@ -39,4 +39,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.github.lecho:hellocharts-library:1.5.8@aar'
     compile files('src/libs/hellocharts-library-1.5.8.jar')
+    compile 'com.beardedhen:androidbootstrap:2.0.1'
 }

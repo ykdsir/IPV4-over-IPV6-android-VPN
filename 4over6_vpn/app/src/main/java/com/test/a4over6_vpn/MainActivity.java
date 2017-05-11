@@ -21,6 +21,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 
+import com.beardedhen.androidbootstrap.AwesomeTextView;
+import com.beardedhen.androidbootstrap.BootstrapButton;
+import com.beardedhen.androidbootstrap.TypefaceProvider;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -68,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private static String downloadTotalPkg;
     private static String uploadTotalLength;
     private static String downloadTotalLength;
-    private static final  int INFOLENGTH = 6;
+    private static final  int INFOLENGTH = 50;
     private static int infoKey = 0;
     private static float uploadSpeedInfo[];
     private static float downloadSpeedInfo[];
@@ -78,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private static float downloadTotalLengthInfo[];
     private static String unit1;
     private static String unit2;
+    private static Intent Myintent;
 
 
     private boolean IPflag =  true;
@@ -102,11 +107,11 @@ public class MainActivity extends AppCompatActivity {
     }
     private Handler mHandler = new Handler() {
         public void handleMessage (Message msg) { // in main(UI) thread
-            TextView editText = (TextView) findViewById(R.id.editText);
+    //        TextView editText = (TextView) findViewById(R.id.editText);
 //            TextView uploadspeed = (TextView)findViewById(R.id.UploadSpeed);
 //            TextView downloadspeed = (TextView)findViewById(R.id.DownloadSpeed);
-            TextView uploadLength = (TextView)findViewById(R.id.UploadTotalLength);
-            TextView downloadLength = (TextView)findViewById(R.id.DownloadTotalLength);
+            AwesomeTextView uploadLength = (AwesomeTextView)findViewById(R.id.UploadTotalLength);
+            AwesomeTextView downloadLength = (AwesomeTextView)findViewById(R.id.DownloadTotalLength);
 //            TextView uploadPkg = (TextView)findViewById(R.id.UploadPkg);
 //            TextView downloadPkg = (TextView)findViewById(R.id.DownloadPkg);
             switch (msg.what) {
@@ -158,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     //第一条折线+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
                     drawLine(uploadSpeedInfo,(LineChartView)findViewById(R.id.uploadSpeedchart),"uploadSpeed");
                     drawLine(downloadSpeedInfo,(LineChartView)findViewById(R.id.downloadspeedchart),"downloadSpeed");
 //                    drawLine(uploadTotalLengthInfo,(LineChartView)findViewById(R.id.uploadTotalLengthchart),"uploadTotalLength");
@@ -176,10 +182,10 @@ public class MainActivity extends AppCompatActivity {
                 case MSG_STATUS:
                     String status = (String)msg.obj;
                     Log.d("wjf", status);
-                    editText.setText(status + "\n");
+               //     editText.setText(status + "\n");
                     break;
                 case MSG_CONNECT:
-                    editText.setText("");
+              //      editText.setText("");
                     String temp = (String)msg.obj;
                     Log.d("wjf", "MSG_CONNECT " + temp);
                     info = temp.split(" ");
@@ -193,12 +199,12 @@ public class MainActivity extends AppCompatActivity {
                             dns2     = info[3];
                             dns3     = info[4];
                             sockfd   = info[5];
-                            editText.append(ipv4Addr + "\n");
-                            editText.append(router + "\n");
-                            editText.append(dns1 + "\n");
-                            editText.append(dns2 + "\n");
-                            editText.append(dns3 + "\n");
-                            editText.append(info[5] + "\n");
+                    //        editText.append(ipv4Addr + "\n");
+                 //           editText.append(router + "\n");
+                 //           editText.append(dns1 + "\n");
+//                            editText.append(dns2 + "\n");
+//                            editText.append(dns3 + "\n");
+//                            editText.append(info[5] + "\n");
                             Log.d("wjf", "Will start VPN now");
                             startVPNService();
                         } else {
@@ -209,7 +215,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case MSG_DISCONNECT:
-                    editText.setText((String)msg.obj);
+           //         editText.setText((String)msg.obj);
+                    stopService(Myintent);
+                    Log.d("wjf","stopMyintent");
                     break;
                 default:
                     break;
@@ -219,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_main);
        // chart = (ColumnChartView)findViewById( R.id.chart);
         uploadSpeedInfo = new float[INFOLENGTH];
@@ -227,11 +236,12 @@ public class MainActivity extends AppCompatActivity {
         downloadTotalPkgInfo = new float[INFOLENGTH];
         uploadTotalLengthInfo = new float[INFOLENGTH];
         downloadTotalLengthInfo = new float[INFOLENGTH];
+
         // Example of a call to a native method
         //Done 检查网络状态，获取IPV6地址
         checkNetStatus();
         //TODO 开启后台线程，调用startBackground()
-        final Button connectButton = (Button)findViewById(R.id.ConnectButton);
+        final BootstrapButton connectButton = (BootstrapButton)findViewById(R.id.ConnectButton);
         connectButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view)
             {
@@ -241,6 +251,20 @@ public class MainActivity extends AppCompatActivity {
                 Runnable background = new Runnable(){
                     public void run()
                     {
+//                        int t=1;
+//                        while(t>0)
+//                        {
+//                            try {
+//                                Thread.sleep(1000);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                            Message message = new Message();
+//                            message.what = MSG_UPDATEUI;
+//                            message.obj = ""+t+" "+t+" "+t+" "+t+" "+t+" "+t+" k k";
+//                            mHandler.sendMessage(message);
+//                            t+=1;
+//                        }
                         Log.d("background","start background thread");
                         String temp = startBackground();
                         Log.d("background","return" + temp);
@@ -324,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
 //        out.write(arr, 0, arr.length)
 //        out.flush();
 //        out.close();
-        final Button disConnectButton = (Button)findViewById(R.id.DisConnectButton);
+        final BootstrapButton disConnectButton = (BootstrapButton)findViewById(R.id.DisConnectButton);
         disConnectButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 IPflag = true;
@@ -343,19 +367,24 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 1; ++i) {
 
             List<PointValue> values = new ArrayList<PointValue>();
-            for (int j = 0; j < INFOLENGTH; ++j) {
+            for (int j = INFOLENGTH-1; j >=0; --j) {
                 values.add(new PointValue(j,infoArray[j]));
             }
 
             Line line = new Line(values);
-            line.setColor(ChartUtils.COLORS[i]);
-            line.setShape(ValueShape.CIRCLE);
-            line.setCubic(false);
-            line.setFilled(false);
-            line.setHasLabels(false);
-            line.setHasLabelsOnlyForSelected(false);
-            line.setHasLines(true);
-            line.setHasPoints(true);
+            line = new Line(values);
+            line.setColor(ChartUtils.COLOR_RED);
+            line.setHasPoints(false);
+            line.setStrokeWidth(3);
+            lines.add(line);
+//            line.setColor(ChartUtils.COLORS[i]);
+//            line.setShape(ValueShape.CIRCLE);
+//            line.setCubic(false);
+//            line.setFilled(false);
+//            line.setHasLabels(false);
+//            line.setHasLabelsOnlyForSelected(false);
+//            line.setHasLines(true);
+//            line.setHasPoints(true);
             if (true) {
                 line.setPointColor(ChartUtils.COLORS[(i + 1)
                         % ChartUtils.COLORS.length]);
@@ -380,6 +409,8 @@ public class MainActivity extends AppCompatActivity {
             data.setAxisYLeft(null);
         }
         LineChartView uploadSpeedChart = chartview;
+        chartview.setVisibility(View.VISIBLE);
+
         data.setBaseValue(Float.NEGATIVE_INFINITY);
         uploadSpeedChart.setLineChartData(data);
     }
@@ -412,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkNetStatus() {
-        TextView statusTextView = (TextView) findViewById(R.id.NetworkStatusTextView);
+        AwesomeTextView statusTextView = (AwesomeTextView) findViewById(R.id.NetworkStatusTextView);
         if (!isNetConnected()) {
             Toast.makeText(MainActivity.this, "You are not connected to network", Toast.LENGTH_SHORT).show();
             statusTextView.setText("You are not connected to network" + "\n");
@@ -426,10 +457,13 @@ public class MainActivity extends AppCompatActivity {
         statusTextView.setText("You are connected by WiFi\n");
 
         String macAddr = getMacAddress();
-        TextView macTextView = (TextView) findViewById(R.id.MacTextView);
+
+        AwesomeTextView macTextView = (AwesomeTextView) findViewById(R.id.MacTextView);
+
         macTextView.setText(macAddr);
+        Log.d("wjf","Mac");
         String ipv6Addr = getIPv6Address();
-        TextView textView = (TextView)findViewById(R.id.IPv6AddressTextView);
+        AwesomeTextView textView = (AwesomeTextView)findViewById(R.id.IPv6AddressTextView);
         textView.setText(ipv6Addr);
         Log.d("wjf", ipv6Addr);
     }
@@ -504,15 +538,15 @@ public class MainActivity extends AppCompatActivity {
         if(result == RESULT_OK)
         {
             Log.d("wjf","result_ok");
-            Intent intent = new Intent(MainActivity.this,MyVPNService.class);
-            intent.putExtra("ipv4Addr", ipv4Addr);
-            intent.putExtra("router", router);
-            intent.putExtra("dns1", dns1);
-            intent.putExtra("dns2", dns2);
-            intent.putExtra("dns3", dns3);
-            intent.putExtra("sockfd", sockfd);
+            Myintent = new Intent(MainActivity.this,MyVPNService.class);
+            Myintent.putExtra("ipv4Addr", ipv4Addr);
+            Myintent.putExtra("router", router);
+            Myintent.putExtra("dns1", dns1);
+            Myintent.putExtra("dns2", dns2);
+            Myintent.putExtra("dns3", dns3);
+            Myintent.putExtra("sockfd", sockfd);
             Log.d("wjf","startService()");
-            startService(intent);
+            startService(Myintent);
         }
     }
 
