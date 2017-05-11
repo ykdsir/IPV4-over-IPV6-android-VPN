@@ -25,15 +25,34 @@ public class MyVPNService extends VpnService{
     String dns3;//="202.106.0.20";
     String sockfd;
     Builder builder = new Builder();
+    private static ParcelFileDescriptor m_interface;
     public void onCreate()
     {
         Log.d("wjf","VPNService onCreate");
         super.onCreate();
 
     }
+
+    public void onDestroy()
+    {
+        super.onDestroy();
+        try {
+            Log.d("wjf","ondestroy");
+            m_interface.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public int onStartCommand(Intent intent,int flags,int startId)
     {
         try {
+            String info = intent.getStringExtra("info");
+            if(info.equals("disconnect"))
+            {
+                closeInterface();
+                return START_STICKY;
+            }
+
             ipv4Addr = intent.getStringExtra("ipv4Addr");
             if (ipv4Addr == null) Log.e("wjf", "Ipv4 is null");
             else Log.d("wjf", ipv4Addr);
@@ -78,7 +97,7 @@ public class MyVPNService extends VpnService{
             } else {
                 Log.e("wjf", "SockFd not protected " + sockfd);
             }
-            ParcelFileDescriptor m_interface = builder.establish();
+             m_interface = builder.establish();
             if(m_interface == null)
             {
                 Log.e("wjf","m_interface is null");
@@ -117,6 +136,14 @@ public class MyVPNService extends VpnService{
             e.printStackTrace();
         }
 
+    }
+    public static void closeInterface()
+    {
+        try {
+            m_interface.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public native void setFD();

@@ -199,6 +199,8 @@ public class MainActivity extends AppCompatActivity {
                             dns2     = info[3];
                             dns3     = info[4];
                             sockfd   = info[5];
+                            AwesomeTextView statusTextView = (AwesomeTextView) findViewById(R.id.NetworkStatusTextView);
+                            statusTextView.setText("Successful!Your ipv4address:"+ipv4Addr);
                     //        editText.append(ipv4Addr + "\n");
                  //           editText.append(router + "\n");
                  //           editText.append(dns1 + "\n");
@@ -216,7 +218,10 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case MSG_DISCONNECT:
            //         editText.setText((String)msg.obj);
+                    Myintent.putExtra("info","disconnect");
+                    startService(Myintent);
                     stopService(Myintent);
+
                     Log.d("wjf","stopMyintent");
                     break;
                 default:
@@ -245,6 +250,15 @@ public class MainActivity extends AppCompatActivity {
         connectButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view)
             {
+                if(!checkNetStatus())
+                {
+                    //tangkaung
+                    return;
+                }
+                if(ifConnect)
+                {
+                    return;
+                }
                 Log.d("wjf","kaiqi back");
                 Toast.makeText(MainActivity.this,"kai qi background",Toast.LENGTH_LONG).show();
 
@@ -442,12 +456,12 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void checkNetStatus() {
+    private boolean checkNetStatus() {
         AwesomeTextView statusTextView = (AwesomeTextView) findViewById(R.id.NetworkStatusTextView);
         if (!isNetConnected()) {
             Toast.makeText(MainActivity.this, "You are not connected to network", Toast.LENGTH_SHORT).show();
             statusTextView.setText("You are not connected to network" + "\n");
-            return;
+            return false;
         }
         /*if (!isWifiConnected()) {
             Toast.makeText(MainActivity.this, "You are not connected by WiFi", Toast.LENGTH_SHORT).show();
@@ -466,6 +480,7 @@ public class MainActivity extends AppCompatActivity {
         AwesomeTextView textView = (AwesomeTextView)findViewById(R.id.IPv6AddressTextView);
         textView.setText(ipv6Addr);
         Log.d("wjf", ipv6Addr);
+        return true;
     }
 
     private String getMacAddress() {
@@ -539,6 +554,7 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("wjf","result_ok");
             Myintent = new Intent(MainActivity.this,MyVPNService.class);
+            Myintent.putExtra("info","connect");
             Myintent.putExtra("ipv4Addr", ipv4Addr);
             Myintent.putExtra("router", router);
             Myintent.putExtra("dns1", dns1);

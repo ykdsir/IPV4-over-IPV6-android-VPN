@@ -62,10 +62,10 @@
                         <!--android:layout_height="wrap_content"-->
                         <!--android:layout_weight="1"/>-->
                     <com.beardedhen.androidbootstrap.AwesomeTextView
-                        android:layout_width="202dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/IPv6AddressTextView"
-                        android:textSize="20dp"
+                        android:textSize="12dp"
                         app:bootstrapBrand="primary"
                         tools:ignore="SpUsage"
                         />
@@ -138,7 +138,7 @@
                         app:bootstrapSize="lg"
                         />
                     <com.beardedhen.androidbootstrap.AwesomeTextView
-                        android:layout_width="203dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:id="@+id/NetworkStatusTextView"

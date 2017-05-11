@@ -373,7 +373,7 @@ Java_com_test_a4over6_1vpn_MainActivity_startBackground(JNIEnv *env, jobject ins
     server.sin6_port = htons(45000); //0表示让系统自动分配一个空闲端口
 //    server.sin6_port = htons(9734); //0表示让系统自动分配一个空闲端口
 
-    if (inet_pton(AF_INET6, "2402:f000:5:8601:b484:d536:d944:3616", &server.sin6_addr) < 0)
+    if (inet_pton(AF_INET6, "2402:f000:ffff:64:d454:4d7a:e00:a750", &server.sin6_addr) < 0)
 //    if (inet_pton(AF_INET6, "2402:f000:1:4417::900", &server.sin6_addr) < 0)
     {
         returnValue = ("Net address error\n");
