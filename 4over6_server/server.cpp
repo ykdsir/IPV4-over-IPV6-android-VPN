@@ -30,6 +30,7 @@ int handle_104(int sockfd);
 void handle_102(int fd,Msg msg);
 int recv_Msg(int fd, Msg *msg);
 void handleMsg(int fd,Msg* msg);
+void free_inaddr(in_addr v4addr);
 char dns_addr[] = "202.38.120.242 8.8.8.8 202.106.0.20";
 char ip_base[] = "13.8.0.";
 int main()
@@ -83,7 +84,7 @@ int main()
 
 //激活虚拟网卡增加到虚拟网卡的路由
     interface_up(tun_name);
-    //route_add(tun_name);
+    route_add(tun_name);
     char command[64];
     sprintf(command,"ifconfig %s 13.8.0.1/24",tun_name);
     system(command);
@@ -93,17 +94,6 @@ int main()
     system(command);
     sprintf(command,"sh iptables.sh");
     system(command);
-	// tun_fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);//tun 虚接口
-	// printf("tun_fd : %d, errno : %d\n", tun_fd,errno);
-	// const int on=1;
-	// if(setsockopt(tun_fd,IPPROTO_IP,IP_HDRINCL,&on,sizeof(on))<0){
-	// 	printf("tun init failed errno : %d\n",errno);
-	// }
-	// memset(&tun_address, 0, sizeof(tun_address));
-	//tun_address.sin_family = AF_INET;
-	//inet_pton(AF_INET, "13.0.8.1", (void *)&tun_address.sin_addr);
-	//tun_address.sin_port = htons(9735);
-	//bind(tun_fd,(struct sockaddr *)&tun_address, sizeof(tun_address));
 
 	//TODO:创建客户信息表和地址池
 	for(int i=0; i<ADDR_SIZE; i++){
@@ -111,20 +101,6 @@ int main()
 		sprintf(ipaddr[i].addr,"%s%d",ip_base,i+1);
 	}
 	ipaddr[0].status = 1;
-	//TODO:获取服务器DNS地址
-
-	// FILE *fp; 
-	// system("cat /etc/resolv.conf | grep -i nameserver | cut -c 12-30 > ./dns.txt");
-	// char dns[32];
-	// if(fp = fopen("dns.txt","r")){
-	// 	fscanf(fp,"%s",dns);
-	// }else{
-	// 	perror("open dns.txt failed");
-	// }
-	// fclose(fp);
-	// printf("dns:%s\n",dns);
-	// in_addr server_v4;
-	// inet_pton(AF_INET, dns, (void *)&server_v4);
 	//TODO:创建keeplive线程
 	pthread_t ka_id;
 	pthread_create(&ka_id, NULL, keepalive, NULL);
@@ -147,13 +123,11 @@ int main()
 		int fd;
 		int nread = 0;
 		testfds = readfds;
-		//printf("server waiting\n");
 		struct stat tStat;
 		for(fd = 0; fd < FD_SETSIZE; fd++) {
 			if (FD_ISSET(fd,&testfds) && (-1 == fstat(fd, &tStat))) {
 				printf("fstat %d error:%s\n", fd, strerror(errno));
 				FD_CLR(fd, &readfds);
-				//manager.del_user(fd);
 			}
 		}
 		result = select(FD_SETSIZE, &testfds, (fd_set *)0,(fd_set *)0,(struct timeval *)NULL);//非阻塞
@@ -246,13 +220,7 @@ static void *keepalive(void* args){
 			if((now - current->secs) > 60){
 				printf("%d socket don't alive !\n",current->fd);
 				in_addr v4addr = current->v4addr;
-				for(int i=0; i<ADDR_SIZE; i++){
-					char addr[32];
-					if(strcmp(ipaddr[i].addr,inet_ntop(AF_INET, &v4addr, addr, sizeof(addr)))==0){
-						ipaddr[i].status = 0;
-						break;
-					}
-				}
+				free_inaddr(v4addr);
 				FD_CLR(fd,&readfds);
 				manager.del_user(fd);
 				try{
@@ -264,7 +232,18 @@ static void *keepalive(void* args){
 		}
 	}
 	return 0;
-} 
+}
+
+
+void free_inaddr(in_addr v4addr){
+	for(int i=0; i<ADDR_SIZE; i++){
+		char addr[32];
+		if(strcmp(ipaddr[i].addr,inet_ntop(AF_INET, &v4addr, addr, sizeof(addr)))==0){
+			ipaddr[i].status = 0;
+			break;
+		}
+	}
+}
 
 static void *read_tun(void* args){
 	printf("----read tun thread start-----\n");
@@ -279,16 +258,21 @@ static void *read_tun(void* args){
 
             in_addr dest = *(in_addr*)&iphead.dwIPDes;
             in_addr sour = *(in_addr*)&iphead.dwIPSrc;
+
             char buff[32];
+            //printf("103 dest addr : %s\n",inet_ntop(AF_INET,&dest,buff,sizeof(buff)));
             if(memcmp("13.8.0",inet_ntop(AF_INET,&dest,buff,sizeof(buff)),6)==0){
                 in_addr temp;
                 int length = ntohs(iphead.wPacketLen);
                 memcpy(msg.data,buf,length);
+                if(length > 4096)
+	                printf("one ip package length: %d\n",length );
                 msg.length = length + 5;
                 msg.type = 103;
                 User_Info_Table *user = manager.find_user(dest);
                 if(user){
                     int fd = user->fd;
+                    if(!FD_ISSET(fd,&testfds))continue;
 					int num = 0;
                     try{
                     	num = write(fd,&msg,msg.length);
@@ -302,14 +286,17 @@ static void *read_tun(void* args){
                         if(errno != EINTR && errno != 0){
                             printf("send 103 message failed, errno : %s\n", strerror(errno));
                             FD_CLR(fd,&readfds);
+                            manager.del_user(fd);
+                            free_inaddr(dest);
                             try{
                                 close(fd);
+                                continue;
                             }catch (...){
                                 printf("main close fd failed \n");
                             }
                         }
 					}
-                    //printf("send 103 message, length: %d\n",num);
+                    printf("send 103 message to %d, length: %d\n",fd,num);
                 }
             }
        }else{
@@ -320,7 +307,7 @@ static void *read_tun(void* args){
 }
 
 void send_ip_responce(int sockfd,int addr){
-	printf("----send_ip_responce-----\n");
+	//printf("----send_ip_responce-----\n");
 	char data[4096];
 	memset(data,0, sizeof(data));
 	sprintf(data,"%s 0.0.0.0 %s",ipaddr[addr].addr,dns_addr);
@@ -337,12 +324,12 @@ void send_ip_responce(int sockfd,int addr){
 	}catch(...) {
 		printf("send ip responce failed, errno : %s\n", strerror(errno));
 	}
-	printf("send 101 message %d bytes\n", num);
+	printf("send 101 message %d bytes to %d\n", num,sockfd);
 	return;
 }
 
 int handle_100(int sockfd){
-	printf("----handle  100-----\n");
+	printf("handle  100 message from %d\n",sockfd);
 	int addr = 0;
 	char ip[20];
 	for(addr=0;addr<ADDR_SIZE;addr++){
@@ -361,7 +348,7 @@ int handle_100(int sockfd){
 }
 
 int handle_104(int sockfd){
-	printf("----handle  104----- : %d\n",sockfd);
+	printf("handle  104 message from %d\n",sockfd);
 	User_Info_Table *user = manager.find_user(sockfd);
 	user -> secs = time(NULL);
 	return 0;
@@ -384,37 +371,17 @@ void send_104_package(int sockfd){
 }
 
 void handle_102(int fd,Msg msg){
-	//printf("recv 102 Message -> data: %s\n",msg.data);
-    //printf("length : %d", length);
+	
 	char buff[32];
 	char data[4096];
-	//printf("\n");
+
 	memcpy(data,msg.data,sizeof(msg.data));
-	// User_Info_Table *user = manager.find_user(fd);
-	// in_addr source = user->v4addr;
-	// memcpy(data+12,(char *)&source,4);
+
 	 IP_HEAD iphead;
- //    TCP_HEAD tcphead;
 	 iphead = *(IP_HEAD*)data;
- //    tcphead = *(TCP_HEAD*)(data + sizeof(struct IP_HEAD));
 	 in_addr dest = *(in_addr*)&iphead.dwIPDes;
 	 in_addr sour = *(in_addr*)&iphead.dwIPSrc;
 	int length = ntohs(iphead.wPacketLen);
-	// char ptype = iphead.byProtocolType;
-	// struct sockaddr_in addr;
-	// addr.sin_family = AF_INET;
-	// addr.sin_addr = dest; //IP
-	// addr.sin_port = 8888; //端口，IP层端口可随意填
- //    char *neir = data + sizeof(struct IP_HEAD) + sizeof(struct TCP_HEAD);
-//    printf("request data : %s\n",neir);
-//	printf("protocol type %c,   %d\n",ptype,(int)ptype);
-	//printf("source addr: %s\n",inet_ntop(AF_INET,&sour,buff,sizeof(buff)));
-//    printf("source port: %d\n",tcphead.m_sSourPort);
-//    printf("dest port: %d\n",tcphead.m_sDestPort);
-	//printf("dest addr: %s\n",inet_ntop(AF_INET,&dest,buff,sizeof(buff)));
-
-
-	//int num = sendto(tun_fd, data, length, 0, (struct sockaddr * )&addr, sizeof(addr));
 
     int num = 0 ;
 	try {
@@ -424,6 +391,8 @@ void handle_102(int fd,Msg msg){
 		printf("send  from tun failed errno : %s\n", strerror(errno));
 	}
 	//printf("send to tun  %d bytes\n",num);
+	char bufff[32];
+	printf("hangle 102 message from :%s , to %s\n", inet_ntop(AF_INET,&sour,bufff,sizeof(bufff)),inet_ntop(AF_INET,&dest,buff,sizeof(buff)));
 	return;
 }
 
@@ -469,6 +438,10 @@ int recv_Msg(int fd, Msg *reciveMsg){
                 if(errno != EINTR && errno != 0){
                     printf("recv_Msg from %d failed errno : %s, \n" , fd,strerror(errno));
                     FD_CLR(fd,&readfds);
+                    User_Info_Table *user = manager.find_user(fd);
+                    in_addr v4addr = user->v4addr;
+                    free_inaddr(v4addr);
+                    manager.del_user(fd);
                     try{
                         close(fd);
                         return -1;
